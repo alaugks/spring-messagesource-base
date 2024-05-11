@@ -40,10 +40,13 @@ class BaseTranslationMessageSourceTest {
             new Translation("messages", Locale.forLanguageTag("en"), "roadrunner", "Road Runner and Wile E. Coyote"));
         translations.add(
             new Translation("messages", Locale.forLanguageTag("de"), "roadrunner", "Road Runner und Wile E. Coyote"));
+
         messageSource = new BaseTranslationMessageSource(
-            new CatalogHandler(
-                new Catalog(translations, Locale.forLanguageTag("en"), "messages")
-            )
+            CatalogHandler
+                .builder()
+                //.addHandler(new CatalogCache(new ConcurrentMapCache("test-cache")))
+                .addHandler(new Catalog(translations, Locale.forLanguageTag("en"), "messages"))
+                .build()
         );
     }
 

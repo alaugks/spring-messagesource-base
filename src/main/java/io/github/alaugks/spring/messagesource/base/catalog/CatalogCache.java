@@ -12,13 +12,10 @@ public final class CatalogCache extends CatalogAbstract {
 
     private final Cache cache;
 
-    public CatalogCache(CatalogInterface catalog, Cache cache) {
-        Assert.notNull(catalog, "catalog must not be null");
+    public CatalogCache(Cache cache) {
         Assert.notNull(cache, "cache must not be null");
 
-        this.nextHandler(catalog);
         this.cache = cache;
-        this.build();
     }
 
     @Override
@@ -68,7 +65,9 @@ public final class CatalogCache extends CatalogAbstract {
         return value;
     }
 
-    private void build() {
+    @Override
+    public void build() {
+        super.build();
         super.getAll().forEach((langCode, catalogDomain) -> catalogDomain.forEach((code, value) ->
             this.put(
                 Locale.forLanguageTag(

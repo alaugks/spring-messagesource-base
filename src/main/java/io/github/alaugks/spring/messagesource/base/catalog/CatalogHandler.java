@@ -1,52 +1,56 @@
 package io.github.alaugks.spring.messagesource.base.catalog;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import org.springframework.cache.Cache;
 import org.springframework.util.Assert;
 
-public final class CatalogHandler {
+public final class CatalogHandler implements CatalogHandlerInterface {
 
     private final CatalogInterface catalog;
 
-    public CatalogHandler(CatalogInterface catalog) {
+    private CatalogHandler(CatalogInterface catalog) {
         this.catalog = catalog;
     }
 
-    public static Builder builder(Catalog catalog) {
-        return new Builder(catalog);
+    public static Builder builder() {
+        return new Builder();
     }
 
     public static final class Builder {
 
-        private final Catalog catalog;
-        private Cache cache;
+        List<CatalogInterface> catalogList = new ArrayList<>();
 
-        public Builder(Catalog catalog) {
-            Assert.notNull(catalog, "catalog must not be null");
-
-            this.catalog = catalog;
-        }
-
-        public Builder withCache(Cache cache) {
-            Assert.notNull(cache, "cache must not be null");
-
-            this.cache = cache;
+        public Builder addHandler(CatalogInterface catalog) {
+            Assert.notNull(catalog, "cache must not be null");
+            this.catalogList.add(catalog);
             return this;
         }
 
         public CatalogHandler build() {
-            if (this.cache != null) {
-                return new CatalogHandler(new CatalogCache(this.catalog, this.cache));
+            Assert.isTrue(!this.catalogList.isEmpty(), "cache must not be null");
+
+            Iterator<CatalogInterface> list = this.catalogList.iterator();
+            CatalogInterface catalog = list.next();
+            while (list.hasNext()) {
+                CatalogInterface nextCatalog = list.next();
+                if (nextCatalog != null) {
+                    catalog.nextHandler(nextCatalog);
+                }
             }
-            return new CatalogHandler(this.catalog);
+            catalog.build();
+            return new CatalogHandler(catalog);
         }
     }
 
+    @Override
     public Map<String, Map<String, String>> getAll() {
         return this.catalog.getAll();
     }
 
+    @Override
     public String get(Locale locale, String code) {
         return this.catalog.get(locale, code);
     }

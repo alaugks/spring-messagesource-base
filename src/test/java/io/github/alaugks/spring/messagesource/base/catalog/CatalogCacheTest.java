@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.mock;
 
 import java.util.Locale;
 import org.junit.jupiter.api.BeforeAll;
@@ -20,7 +19,7 @@ class CatalogCacheTest {
 
     @BeforeAll
     void beforeAll() {
-        var cache = new ConcurrentMapCache("text-cache");
+        var cache = new ConcurrentMapCache("test-cache");
         cache.put("en|messages.m_en_1", "value_m_en_1");
         cache.put("en|messages.m_en_2", "value_m_en_2");
         cache.put("en|domain.d_en_1", "value_d_en_1");
@@ -28,7 +27,7 @@ class CatalogCacheTest {
         cache.put("de|messages.m_de_2", "value_m_de_2");
         cache.put("de|domain.d_de_1", "value_d_de_1");
 
-        this.catalogCache = new CatalogCache(mock(CatalogInterface.class), cache);
+        this.catalogCache = new CatalogCache(cache);
     }
 
     @Test
@@ -64,7 +63,7 @@ class CatalogCacheTest {
     @Test
     void test_cache_paramter_isNull() {
         try {
-            new CatalogCache(mock(CatalogInterface.class), null);
+            new CatalogCache(null);
             fail("Exception should be throw");
         } catch (IllegalArgumentException e) {
             assertInstanceOf(IllegalArgumentException.class, e);

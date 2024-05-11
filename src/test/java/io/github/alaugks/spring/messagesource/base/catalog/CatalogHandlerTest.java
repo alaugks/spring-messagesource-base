@@ -27,7 +27,8 @@ class CatalogHandlerTest {
         var baseCatalog = new Catalog(translations, this.locale, domain);
 
         var catalogHandler = CatalogHandler
-            .builder(baseCatalog)
+            .builder()
+            .addHandler(baseCatalog)
             .build();
 
         assertEquals("from_base_catalog", catalogHandler.get(this.locale, key));
@@ -42,16 +43,17 @@ class CatalogHandlerTest {
         List<Translation> translations = new ArrayList<>();
         translations.add(new Translation(domain, this.locale, "key", "from_base_catalog"));
         var baseCatalog = new Catalog(translations, this.locale, domain);
-
         var cache = new ConcurrentMapCache("text-cache");
+        var cacheCatalog = new CatalogCache(cache);
 
         // Is translation in cache?
         var cacheBuffer = cacheToArray(cache);
         assertNull(cacheBuffer.get(localeKey));
 
         var catalogHandler = CatalogHandler
-            .builder(baseCatalog)
-            .withCache(cache)
+            .builder()
+            .addHandler(cacheCatalog)
+            .addHandler(baseCatalog)
             .build();
 
         // Exists item in Cache after build?

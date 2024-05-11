@@ -32,6 +32,7 @@ class CatalogTest {
         translations.add(new Translation("foo", Locale.forLanguageTag("en_US"), "key_2", "value_en_us_2"));
 
         catalog = new Catalog(translations, Locale.forLanguageTag("en"), "foo");
+        catalog.build();
     }
 
     @Test

@@ -31,6 +31,13 @@ abstract class CatalogAbstract implements CatalogInterface {
         return this.nextHandler.get(locale, code);
     }
 
+    @Override
+    public void build() {
+        if (this.nextHandler != null) {
+            this.nextHandler.build();
+        }
+    }
+
     protected String localeToLocaleKey(Locale locale) {
         Locale.Builder localeBuilder = new Locale.Builder();
         localeBuilder.setLanguage(locale.getLanguage());

@@ -3,14 +3,9 @@ package io.github.alaugks.spring.messagesource.base.catalog;
 import java.util.Locale;
 import java.util.Map;
 
-public interface CatalogInterface {
+public interface CatalogHandlerInterface {
 
-    CatalogInterface nextHandler(CatalogInterface handler);
-
-    // HashMap<"language+region", HashMap<"code", "value">>
     Map<String, Map<String, String>> getAll();
 
     String get(Locale locale, String code);
-
-    void build();
 }

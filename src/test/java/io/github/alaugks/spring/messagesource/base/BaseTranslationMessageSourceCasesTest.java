@@ -54,11 +54,10 @@ class BaseTranslationMessageSourceCasesTest {
         }
 
         this.messageSource = new BaseTranslationMessageSource(
-            new CatalogHandler(
-                new Catalog(
-                    translations, Locale.forLanguageTag("en"), "messages"
-                )
-            )
+            CatalogHandler
+                .builder()
+                .addHandler(new Catalog(translations, Locale.forLanguageTag("en"), "messages"))
+                .build()
         );
 
     }
@@ -84,9 +83,10 @@ class BaseTranslationMessageSourceCasesTest {
         );
 
         var messageSource = new BaseTranslationMessageSource(
-            new CatalogHandler(
-                new Catalog(translations, Locale.forLanguageTag("en"), "messages")
-            )
+            CatalogHandler
+                .builder()
+                .addHandler(new Catalog(translations, Locale.forLanguageTag("en"), "messages"))
+                .build()
         );
 
         assertEquals("There are 10,000 files.", messageSource.getMessage(

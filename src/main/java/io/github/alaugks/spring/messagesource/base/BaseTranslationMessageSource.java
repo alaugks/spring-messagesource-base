@@ -1,6 +1,6 @@
 package io.github.alaugks.spring.messagesource.base;
 
-import io.github.alaugks.spring.messagesource.base.catalog.CatalogHandler;
+import io.github.alaugks.spring.messagesource.base.catalog.CatalogHandlerInterface;
 import java.text.MessageFormat;
 import java.util.Locale;
 import org.springframework.context.MessageSource;
@@ -12,11 +12,11 @@ import org.springframework.util.Assert;
 
 public class BaseTranslationMessageSource implements MessageSource {
 
-    private final CatalogHandler catalogHandler;
+    private final CatalogHandlerInterface catalogHandler;
 
-    public BaseTranslationMessageSource(CatalogHandler catalogHandler) {
+    public BaseTranslationMessageSource(CatalogHandlerInterface catalogHandler) {
         Assert.notNull(catalogHandler, "catalogHandler must not be null");
-        
+
         this.catalogHandler = catalogHandler;
     }
 

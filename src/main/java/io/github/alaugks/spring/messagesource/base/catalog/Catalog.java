@@ -13,6 +13,7 @@ public final class Catalog extends CatalogAbstract {
     private final HashMap<String, Map<String, String>> catalogMap;
     private final Locale defaultLocale;
     private final String defaultDomain;
+    private final List<Translation> translations;
 
     public Catalog(List<Translation> translations, Locale defaultLocale, String defaultDomain) {
         Assert.notNull(translations, "translations must not be null");
@@ -20,14 +21,18 @@ public final class Catalog extends CatalogAbstract {
         Assert.notNull(defaultDomain, "defaultDomain must not be null");
 
         this.catalogMap = new HashMap<>();
+        this.translations = translations;
         this.defaultLocale = defaultLocale;
         this.defaultDomain = defaultDomain;
-        translations.forEach(t -> this.put(t.locale(), t.domain(), t.code(), t.value()));
+
     }
 
     @Override
     public Map<String, Map<String, String>> getAll() {
-        return this.catalogMap;
+        if (!this.catalogMap.isEmpty()) {
+            return this.catalogMap;
+        }
+        return super.getAll();
     }
 
     @Override
@@ -37,7 +42,18 @@ public final class Catalog extends CatalogAbstract {
             return null;
         }
 
-        return this.fromCatalogMap(locale, code);
+        String value = this.fromCatalogMap(locale, code);
+        if (value != null) {
+            return value;
+        }
+
+        return super.get(locale, code);
+    }
+
+    @Override
+    public void build() {
+        super.build();
+        this.translations.forEach(t -> this.put(t.locale(), t.domain(), t.code(), t.value()));
     }
 
     private void put(Locale locale, String domain, String code, String value) {
