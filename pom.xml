@@ -38,4 +38,15 @@
         <url>https://github.com/alaugks/spring-messagesource-base</url>
     </scm>
 
+    <repositories>
+        <repository>
+            <id>ossrh-release</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+        <repository>
+            <id>ossrh-snapshot</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+    </repositories>
+
 </project>
