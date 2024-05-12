@@ -27,6 +27,7 @@ jobs:
           cache: 'maven'
       - name: Build & Deploy
         run: |
+          mvn -U clean install
           mvn -U -B clean deploy -P release
         env:
           GPG_PRIVATE_KEY_PASSPHRASE: ${{ secrets.GPG_PRIVATE_KEY_PASSPHRASE }}
