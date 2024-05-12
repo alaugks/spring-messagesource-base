@@ -41,7 +41,6 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
       - name: Build and analyze (dev)
         run: |
-          mvn -U clean install
           mvn test -P test-coverage
           mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
             -Dsonar.projectName=${{ vars.SONAR_PROJECT_NAME }} \
