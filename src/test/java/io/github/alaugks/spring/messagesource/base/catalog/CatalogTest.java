@@ -20,16 +20,16 @@ class CatalogTest {
         List<Translation> translations = new ArrayList<>();
 
         // Domain foo
-        translations.add(new Translation(Locale.forLanguageTag("en"), "key_1", "value_en_1"));
-        translations.add(new Translation(Locale.forLanguageTag("en"), "key_2", "value_en_2"));
-        translations.add(new Translation(Locale.forLanguageTag("en"), "key_1", "value_en_3")); // Check overwrite
+        translations.add(new Translation(Locale.forLanguageTag("en"), "key_1", "value_en_1", "foo"));
+        translations.add(new Translation(Locale.forLanguageTag("en"), "key_2", "value_en_2", "foo"));
+        translations.add(new Translation(Locale.forLanguageTag("en"), "key_1", "value_en_3", "foo")); // Check overwrite
         // Domain bar
-        translations.add(new Translation(Locale.forLanguageTag("en"), "key_1", "value_en_1"));
-        translations.add(new Translation(Locale.forLanguageTag("en"), "key_2", "value_en_2"));
-        translations.add(new Translation(Locale.forLanguageTag("en"), "key_1", "value_en_3")); // Check overwrite
+        translations.add(new Translation(Locale.forLanguageTag("en"), "key_1", "value_en_1", "bar"));
+        translations.add(new Translation(Locale.forLanguageTag("en"), "key_2", "value_en_2", "bar"));
+        translations.add(new Translation(Locale.forLanguageTag("en"), "key_1", "value_en_3", "bar")); // Check overwrite
         // Domain foo
-        translations.add(new Translation(Locale.forLanguageTag("en-US"), "key_1", "value_en_us_1"));
-        translations.add(new Translation(Locale.forLanguageTag("en_US"), "key_2", "value_en_us_2"));
+        translations.add(new Translation(Locale.forLanguageTag("en-US"), "key_1", "value_en_us_1", "foo"));
+        translations.add(new Translation(Locale.forLanguageTag("en_US"), "key_2", "value_en_us_2", "foo"));
 
         catalog = new Catalog(translations, Locale.forLanguageTag("en"), "foo");
         catalog.build();

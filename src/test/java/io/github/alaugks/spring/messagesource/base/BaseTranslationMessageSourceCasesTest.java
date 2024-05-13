@@ -38,13 +38,12 @@ class BaseTranslationMessageSourceCasesTest {
         for (TranslationFile file : resourcesLoader.getTranslationFiles()) {
             String json = new String(file.inputStream().readAllBytes(), StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
-            Map<String, Object> items = mapper.convertValue(mapper.readTree(json), new TypeReference<>() {
-            });
+            Map<String, Object> items = mapper.convertValue(mapper.readTree(json), new TypeReference<>() {});
 
             for (Map.Entry<String, Object> item : items.entrySet()) {
                 translations.add(
                     new Translation(
-                        file.locale(), item.getKey(), item.getValue().toString()
+                        file.locale(), item.getKey(), item.getValue().toString(), file.domain()
                     )
                 );
             }
