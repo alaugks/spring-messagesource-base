@@ -52,7 +52,7 @@ class BaseTranslationMessageSourceCasesTest {
         this.messageSource = new BaseTranslationMessageSource(
             CatalogHandler
                 .builder()
-                .addHandler(new Catalog(translations, Locale.forLanguageTag("en"), "messages"))
+                .addHandler(new Catalog(translations, Locale.forLanguageTag("en")))
                 .build()
         );
 
@@ -77,7 +77,7 @@ class BaseTranslationMessageSourceCasesTest {
         var messageSource = new BaseTranslationMessageSource(
             CatalogHandler
                 .builder()
-                .addHandler(new Catalog(translations, Locale.forLanguageTag("en"), "messages"))
+                .addHandler(new Catalog(translations, Locale.forLanguageTag("en")))
                 .build()
         );
 

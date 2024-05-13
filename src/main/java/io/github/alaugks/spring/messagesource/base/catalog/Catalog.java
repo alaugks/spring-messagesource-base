@@ -1,5 +1,6 @@
 package io.github.alaugks.spring.messagesource.base.catalog;
 
+import io.github.alaugks.spring.messagesource.base.BaseTranslationMessageSource;
 import io.github.alaugks.spring.messagesource.base.records.Translation;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +15,10 @@ public final class Catalog extends CatalogAbstract {
     private final Locale defaultLocale;
     private final String defaultDomain;
     private final List<Translation> translations;
+
+    public Catalog(List<Translation> translations, Locale defaultLocale) {
+        this(translations, defaultLocale, BaseTranslationMessageSource.DEFAULT_DOMAIN);
+    }
 
     public Catalog(List<Translation> translations, Locale defaultLocale, String defaultDomain) {
         Assert.notNull(translations, "translations must not be null");

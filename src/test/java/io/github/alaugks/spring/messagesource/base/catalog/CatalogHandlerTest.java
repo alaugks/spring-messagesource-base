@@ -24,7 +24,7 @@ class CatalogHandlerTest {
         String key = domain + ".key";
         List<Translation> translations = new ArrayList<>();
         translations.add(new Translation(this.locale, "key", "from_base_catalog"));
-        var baseCatalog = new Catalog(translations, this.locale, domain);
+        var baseCatalog = new Catalog(translations, this.locale);
 
         var catalogHandler = CatalogHandler
             .builder()
@@ -42,7 +42,7 @@ class CatalogHandlerTest {
         String localeKey = "en|" + key;
         List<Translation> translations = new ArrayList<>();
         translations.add(new Translation(this.locale, "key", "from_base_catalog"));
-        var baseCatalog = new Catalog(translations, this.locale, domain);
+        var baseCatalog = new Catalog(translations, this.locale);
         var cache = new ConcurrentMapCache("text-cache");
         var cacheCatalog = new CatalogCache(cache);
 

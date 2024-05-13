@@ -41,7 +41,7 @@ class BaseTranslationMessageSourceTest {
             CatalogHandler
                 .builder()
                 //.addHandler(new CatalogCache(new ConcurrentMapCache("test-cache")))
-                .addHandler(new Catalog(translations, Locale.forLanguageTag("en"), "messages"))
+                .addHandler(new Catalog(translations, Locale.forLanguageTag("en")))
                 .build()
         );
     }
