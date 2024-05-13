@@ -1,6 +1,6 @@
 package io.github.alaugks.spring.messagesource.base.catalog;
 
-import io.github.alaugks.spring.messagesource.base.records.TransUnit;
+import io.github.alaugks.spring.messagesource.base.records.Translation;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -13,15 +13,15 @@ public final class Catalog extends CatalogAbstract {
     private final HashMap<String, Map<String, String>> catalogMap;
     private final Locale defaultLocale;
     private final String defaultDomain;
-    private final List<TransUnit> transUnits;
+    private final List<Translation> translations;
 
-    public Catalog(List<TransUnit> transUnits, Locale defaultLocale, String defaultDomain) {
-        Assert.notNull(transUnits, "transUnits must not be null");
+    public Catalog(List<Translation> translations, Locale defaultLocale, String defaultDomain) {
+        Assert.notNull(translations, "translations must not be null");
         Assert.notNull(defaultLocale, "defaultLocale must not be null");
         Assert.notNull(defaultDomain, "defaultDomain must not be null");
 
         this.catalogMap = new HashMap<>();
-        this.transUnits = transUnits;
+        this.translations = translations;
         this.defaultLocale = defaultLocale;
         this.defaultDomain = defaultDomain;
 
@@ -53,7 +53,7 @@ public final class Catalog extends CatalogAbstract {
     @Override
     public void build() {
         super.build();
-        this.transUnits.forEach(t -> this.put(t.locale(), t.domain(), t.code(), t.value()));
+        this.translations.forEach(t -> this.put(t.locale(), t.domain(), t.code(), t.value()));
     }
 
     private void put(Locale locale, String domain, String code, String value) {

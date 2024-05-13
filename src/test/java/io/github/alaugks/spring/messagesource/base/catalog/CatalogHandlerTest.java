@@ -3,7 +3,7 @@ package io.github.alaugks.spring.messagesource.base.catalog;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import io.github.alaugks.spring.messagesource.base.records.TransUnit;
+import io.github.alaugks.spring.messagesource.base.records.Translation;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,9 +22,9 @@ class CatalogHandlerTest {
     void test_catalog() {
         String domain = "messages";
         String key = domain + ".key";
-        List<TransUnit> transUnits = new ArrayList<>();
-        transUnits.add(new TransUnit(this.locale, "key", "from_base_catalog", domain));
-        var baseCatalog = new Catalog(transUnits, this.locale, domain);
+        List<Translation> translations = new ArrayList<>();
+        translations.add(new Translation(this.locale, "key", "from_base_catalog"));
+        var baseCatalog = new Catalog(translations, this.locale, domain);
 
         var catalogHandler = CatalogHandler
             .builder()
@@ -40,9 +40,9 @@ class CatalogHandlerTest {
         String domain = "messages";
         String key = domain + ".key";
         String localeKey = "en|" + key;
-        List<TransUnit> transUnits = new ArrayList<>();
-        transUnits.add(new TransUnit(this.locale, "key", "from_base_catalog", domain));
-        var baseCatalog = new Catalog(transUnits, this.locale, domain);
+        List<Translation> translations = new ArrayList<>();
+        translations.add(new Translation(this.locale, "key", "from_base_catalog"));
+        var baseCatalog = new Catalog(translations, this.locale, domain);
         var cache = new ConcurrentMapCache("text-cache");
         var cacheCatalog = new CatalogCache(cache);
 
