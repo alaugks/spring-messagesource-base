@@ -1,9 +1,9 @@
 name: "OSSRH Release"
 run-name: OSSRH Release [${{ github.ref_name }}]
 on:
-#  push:
-#    branches:
-#      - snapshot/*
+  push:
+    tags:
+      - '**'
   workflow_dispatch:
 jobs:
   release:
@@ -12,6 +12,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -25,9 +26,12 @@ jobs:
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: GPG_PRIVATE_KEY_PASSPHRASE
           cache: 'maven'
+      - name: Run Tests
+        run: |
+          mvn test
+
       - name: Build & Deploy
         run: |
-          mvn -U clean install
           mvn -U -B clean deploy -P release
         env:
           GPG_PRIVATE_KEY_PASSPHRASE: ${{ secrets.GPG_PRIVATE_KEY_PASSPHRASE }}
