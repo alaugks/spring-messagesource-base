@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.alaugks.spring.messagesource.base.catalog.Catalog;
 import io.github.alaugks.spring.messagesource.base.catalog.CatalogHandler;
-import io.github.alaugks.spring.messagesource.base.records.Translation;
+import io.github.alaugks.spring.messagesource.base.records.TransUnit;
 import io.github.alaugks.spring.messagesource.base.records.TranslationFile;
 import io.github.alaugks.spring.messagesource.base.ressources.ResourcesLoader;
 import java.io.IOException;
@@ -28,7 +28,7 @@ class BaseTranslationMessageSourceCasesTest {
     MessageSource messageSource;
 
     public BaseTranslationMessageSourceCasesTest() throws IOException {
-        List<Translation> translations = new ArrayList<>();
+        List<TransUnit> transUnits = new ArrayList<>();
         var resourcesLoader = new ResourcesLoader(
             Locale.forLanguageTag("en"),
             new HashSet<>(List.of("translations_example/*")),
@@ -42,12 +42,9 @@ class BaseTranslationMessageSourceCasesTest {
             });
 
             for (Map.Entry<String, Object> item : items.entrySet()) {
-                translations.add(
-                    new Translation(
-                        file.domain(),
-                        file.locale(),
-                        item.getKey(),
-                        item.getValue().toString()
+                transUnits.add(
+                    new TransUnit(
+                        file.locale(), item.getKey(), item.getValue().toString(), file.domain()
                     )
                 );
             }
@@ -56,7 +53,7 @@ class BaseTranslationMessageSourceCasesTest {
         this.messageSource = new BaseTranslationMessageSource(
             CatalogHandler
                 .builder()
-                .addHandler(new Catalog(translations, Locale.forLanguageTag("en"), "messages"))
+                .addHandler(new Catalog(transUnits, Locale.forLanguageTag("en"), "messages"))
                 .build()
         );
 
@@ -64,28 +61,24 @@ class BaseTranslationMessageSourceCasesTest {
 
     @Test
     void test_messagesFormat_choice() {
-        List<Translation> translations = new ArrayList<>();
-        translations.add(
-            new Translation(
-                "messages",
-                Locale.forLanguageTag("en"),
-                "format_choice",
-                "There {0,choice,0#are no files|1#is one file|1<are {0,number,integer} files}."
+        List<TransUnit> transUnits = new ArrayList<>();
+        transUnits.add(
+            new TransUnit(
+                Locale.forLanguageTag("en"), "format_choice",
+                "There {0,choice,0#are no files|1#is one file|1<are {0,number,integer} files}.", "messages"
             )
         );
-        translations.add(
-            new Translation(
-                "messages",
-                Locale.forLanguageTag("de"),
-                "format_choice",
-                "Es gibt {0,choice,0#keine Datei|1#eine Datei|1<{0,number,integer} Dateien}."
+        transUnits.add(
+            new TransUnit(
+                Locale.forLanguageTag("de"), "format_choice",
+                "Es gibt {0,choice,0#keine Datei|1#eine Datei|1<{0,number,integer} Dateien}.", "messages"
             )
         );
 
         var messageSource = new BaseTranslationMessageSource(
             CatalogHandler
                 .builder()
-                .addHandler(new Catalog(translations, Locale.forLanguageTag("en"), "messages"))
+                .addHandler(new Catalog(transUnits, Locale.forLanguageTag("en"), "messages"))
                 .build()
         );
 

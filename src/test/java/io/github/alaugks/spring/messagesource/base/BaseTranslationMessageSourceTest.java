@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.github.alaugks.spring.messagesource.base.catalog.Catalog;
 import io.github.alaugks.spring.messagesource.base.catalog.CatalogHandler;
-import io.github.alaugks.spring.messagesource.base.records.Translation;
+import io.github.alaugks.spring.messagesource.base.records.TransUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -31,21 +31,21 @@ class BaseTranslationMessageSourceTest {
 
     @BeforeAll
     static void beforeAll() {
-        List<Translation> translations = new ArrayList<>();
-        translations.add(
-            new Translation("messages", Locale.forLanguageTag("en"), "hello_world", "Hello World (messages / en)"));
-        translations.add(
-            new Translation("messages", Locale.forLanguageTag("de"), "hello_world", "Hallo Welt (messages / de)"));
-        translations.add(
-            new Translation("messages", Locale.forLanguageTag("en"), "roadrunner", "Road Runner and Wile E. Coyote"));
-        translations.add(
-            new Translation("messages", Locale.forLanguageTag("de"), "roadrunner", "Road Runner und Wile E. Coyote"));
+        List<TransUnit> transUnits = new ArrayList<>();
+        transUnits.add(
+            new TransUnit(Locale.forLanguageTag("en"), "hello_world", "Hello World (messages / en)", "messages"));
+        transUnits.add(
+            new TransUnit(Locale.forLanguageTag("de"), "hello_world", "Hallo Welt (messages / de)", "messages"));
+        transUnits.add(
+            new TransUnit(Locale.forLanguageTag("en"), "roadrunner", "Road Runner and Wile E. Coyote", "messages"));
+        transUnits.add(
+            new TransUnit(Locale.forLanguageTag("de"), "roadrunner", "Road Runner und Wile E. Coyote", "messages"));
 
         messageSource = new BaseTranslationMessageSource(
             CatalogHandler
                 .builder()
                 //.addHandler(new CatalogCache(new ConcurrentMapCache("test-cache")))
-                .addHandler(new Catalog(translations, Locale.forLanguageTag("en"), "messages"))
+                .addHandler(new Catalog(transUnits, Locale.forLanguageTag("en"), "messages"))
                 .build()
         );
     }

@@ -3,7 +3,7 @@ package io.github.alaugks.spring.messagesource.base.catalog;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import io.github.alaugks.spring.messagesource.base.records.Translation;
+import io.github.alaugks.spring.messagesource.base.records.TransUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -17,21 +17,21 @@ class CatalogTest {
     @BeforeEach
     void BeforeEach() {
 
-        List<Translation> translations = new ArrayList<>();
+        List<TransUnit> transUnits = new ArrayList<>();
 
         // Domain foo
-        translations.add(new Translation("foo", Locale.forLanguageTag("en"), "key_1", "value_en_1"));
-        translations.add(new Translation("foo", Locale.forLanguageTag("en"), "key_2", "value_en_2"));
-        translations.add(new Translation("foo", Locale.forLanguageTag("en"), "key_1", "value_en_3")); // Check overwrite
+        transUnits.add(new TransUnit(Locale.forLanguageTag("en"), "key_1", "value_en_1", "foo"));
+        transUnits.add(new TransUnit(Locale.forLanguageTag("en"), "key_2", "value_en_2", "foo"));
+        transUnits.add(new TransUnit(Locale.forLanguageTag("en"), "key_1", "value_en_3", "foo")); // Check overwrite
         // Domain bar
-        translations.add(new Translation("bar", Locale.forLanguageTag("en"), "key_1", "value_en_1"));
-        translations.add(new Translation("bar", Locale.forLanguageTag("en"), "key_2", "value_en_2"));
-        translations.add(new Translation("bar", Locale.forLanguageTag("en"), "key_1", "value_en_3")); // Check overwrite
+        transUnits.add(new TransUnit(Locale.forLanguageTag("en"), "key_1", "value_en_1", "bar"));
+        transUnits.add(new TransUnit(Locale.forLanguageTag("en"), "key_2", "value_en_2", "bar"));
+        transUnits.add(new TransUnit(Locale.forLanguageTag("en"), "key_1", "value_en_3", "bar")); // Check overwrite
         // Domain foo
-        translations.add(new Translation("foo", Locale.forLanguageTag("en-US"), "key_1", "value_en_us_1"));
-        translations.add(new Translation("foo", Locale.forLanguageTag("en_US"), "key_2", "value_en_us_2"));
+        transUnits.add(new TransUnit(Locale.forLanguageTag("en-US"), "key_1", "value_en_us_1", "foo"));
+        transUnits.add(new TransUnit(Locale.forLanguageTag("en_US"), "key_2", "value_en_us_2", "foo"));
 
-        catalog = new Catalog(translations, Locale.forLanguageTag("en"), "foo");
+        catalog = new Catalog(transUnits, Locale.forLanguageTag("en"), "foo");
         catalog.build();
     }
 

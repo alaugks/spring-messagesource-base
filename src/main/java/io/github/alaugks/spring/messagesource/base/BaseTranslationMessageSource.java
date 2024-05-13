@@ -12,6 +12,8 @@ import org.springframework.util.Assert;
 
 public class BaseTranslationMessageSource implements MessageSource {
 
+    public static final String DEFAULT_DOMAIN = "messages";
+
     private final CatalogHandlerInterface catalogHandler;
 
     public BaseTranslationMessageSource(CatalogHandlerInterface catalogHandler) {
