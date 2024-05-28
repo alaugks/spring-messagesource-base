@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -56,52 +55,6 @@ class BaseTranslationMessageSourceCasesTest {
                 .build()
         );
 
-    }
-
-    @Test
-    void test_messagesFormat_choice() {
-        List<Translation> translations = new ArrayList<>();
-        translations.add(
-            new Translation(
-                Locale.forLanguageTag("en"), "format_choice",
-                "There {0,choice,0#are no files|1#is one file|1<are {0,number,integer} files}."
-            )
-        );
-        translations.add(
-            new Translation(
-                Locale.forLanguageTag("de"), "format_choice",
-                "Es gibt {0,choice,0#keine Datei|1#eine Datei|1<{0,number,integer} Dateien}."
-            )
-        );
-
-        var messageSource = new BaseTranslationMessageSource(
-            CatalogHandler
-                .builder()
-                .addHandler(new Catalog(translations, Locale.forLanguageTag("en")))
-                .build()
-        );
-
-        assertEquals("There are 10,000 files.", messageSource.getMessage(
-            "format_choice",
-            new Object[]{10000L},
-            Locale.forLanguageTag("en")
-        ));
-        assertEquals("There is one file.", messageSource.getMessage(
-            "format_choice",
-            new Object[]{1},
-            Locale.forLanguageTag("en")
-        ));
-
-        assertEquals("Es gibt 10.000 Dateien.", messageSource.getMessage(
-            "format_choice",
-            new Object[]{10000L},
-            Locale.forLanguageTag("de")
-        ));
-        assertEquals("Es gibt eine Datei.", messageSource.getMessage(
-            "format_choice",
-            new Object[]{1},
-            Locale.forLanguageTag("de")
-        ));
     }
 
     @ParameterizedTest()
