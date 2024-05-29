@@ -21,9 +21,11 @@ import org.springframework.context.support.DefaultMessageSourceResolvable;
 
 
 /**
- * Order(100) -> getMessage(code, args, defaultMessage, locale) Order(200) -> getMessage(code, args, locale) Order(300)
- * -> getMessage(resolvable, locale)
+ * Order(100) -> getMessage(code, args, defaultMessage, locale)
+ * Order(200) -> getMessage(code, args, locale)
+ * Order(300) -> getMessage(resolvable, locale)
  */
+@SuppressWarnings({"java:S4144"})
 @TestMethodOrder(OrderAnnotation.class)
 class BaseTranslationMessageSourceTest {
 
@@ -282,30 +284,30 @@ class BaseTranslationMessageSourceTest {
             )
         );
 
-        var messageSource = new BaseTranslationMessageSource(
+        var messageSourceChoice = new BaseTranslationMessageSource(
             CatalogHandler
                 .builder()
                 .addHandler(new Catalog(translations, Locale.forLanguageTag("en")))
                 .build()
         );
 
-        assertEquals("There are 10,000 files.", messageSource.getMessage(
+        assertEquals("There are 10,000 files.", messageSourceChoice.getMessage(
             "format_choice",
             new Object[]{10000L},
             Locale.forLanguageTag("en")
         ));
-        assertEquals("There is one file.", messageSource.getMessage(
+        assertEquals("There is one file.", messageSourceChoice.getMessage(
             "format_choice",
             new Object[]{1},
             Locale.forLanguageTag("en")
         ));
 
-        assertEquals("Es gibt 10.000 Dateien.", messageSource.getMessage(
+        assertEquals("Es gibt 10.000 Dateien.", messageSourceChoice.getMessage(
             "format_choice",
             new Object[]{10000L},
             Locale.forLanguageTag("de")
         ));
-        assertEquals("Es gibt eine Datei.", messageSource.getMessage(
+        assertEquals("Es gibt eine Datei.", messageSourceChoice.getMessage(
             "format_choice",
             new Object[]{1},
             Locale.forLanguageTag("de")
