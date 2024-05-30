@@ -24,6 +24,7 @@ import org.springframework.context.support.DefaultMessageSourceResolvable;
  * Order(100) -> getMessage(code, args, defaultMessage, locale)
  * Order(200) -> getMessage(code, args, locale)
  * Order(300) -> getMessage(resolvable, locale)
+ * Order(400) -> getMessage(code, args, defaultMessage, locale) with other domain ("foo")
  */
 @SuppressWarnings({"java:S4144"})
 @TestMethodOrder(OrderAnnotation.class)
@@ -38,12 +39,12 @@ class BaseTranslationMessageSourceTest {
         translations.add(new Translation(Locale.forLanguageTag("de"), "hello_world", "Hallo Welt (messages / de)"));
         translations.add(new Translation(Locale.forLanguageTag("en"), "roadrunner", "Road Runner and Wile E. Coyote"));
         translations.add(new Translation(Locale.forLanguageTag("de"), "roadrunner", "Road Runner und Wile E. Coyote"));
+        translations.add(new Translation(Locale.forLanguageTag("en"), "bar", "Placeholder", "foo"));
+        translations.add(new Translation(Locale.forLanguageTag("de"), "bar", "Platzhalter", "foo"));
 
         messageSource = new BaseTranslationMessageSource(
             CatalogHandler
-                .builder()
-                //.addHandler(new CatalogCache(new ConcurrentMapCache("test-cache")))
-                .addHandler(new Catalog(translations, Locale.forLanguageTag("en")))
+                .builder(new Catalog(translations, Locale.forLanguageTag("en")))
                 .build()
         );
     }
@@ -269,6 +270,24 @@ class BaseTranslationMessageSourceTest {
     }
 
     @Test
+    @Order(400)
+    void test_getMessage_withOtherDomain() {
+        assertEquals("Placeholder", messageSource.getMessage(
+            "foo.bar",
+            null,
+            "My default message",
+            Locale.forLanguageTag("en")
+        ));
+
+        assertEquals("Platzhalter", messageSource.getMessage(
+            "foo.bar",
+            null,
+            "Meine Standardtext",
+            Locale.forLanguageTag("de")
+        ));
+    }
+
+    @Test
     void test_messagesFormat_choice() {
         List<Translation> translations = new ArrayList<>();
         translations.add(
@@ -286,8 +305,7 @@ class BaseTranslationMessageSourceTest {
 
         var messageSourceChoice = new BaseTranslationMessageSource(
             CatalogHandler
-                .builder()
-                .addHandler(new Catalog(translations, Locale.forLanguageTag("en")))
+                .builder(new Catalog(translations, Locale.forLanguageTag("en")))
                 .build()
         );
 
