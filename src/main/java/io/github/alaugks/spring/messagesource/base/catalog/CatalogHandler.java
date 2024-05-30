@@ -15,31 +15,49 @@ public final class CatalogHandler implements CatalogHandlerInterface {
         this.catalog = catalog;
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public static Builder builder(CatalogInterface catalog) {
+        return new Builder(catalog);
     }
 
     public static final class Builder {
 
+        private final CatalogInterface baseCatalog;
         List<CatalogInterface> catalogList = new ArrayList<>();
 
-        public Builder addHandler(CatalogInterface catalog) {
-            Assert.notNull(catalog, "cache must not be null");
+        public Builder(CatalogInterface baseCatalog) {
+            Assert.notNull(baseCatalog, "Argument baseCatalog must not be null");
+            this.baseCatalog = baseCatalog;
+        }
+
+        public Builder catalogCache(CatalogInterface cacheCatalog) {
+            Assert.notNull(cacheCatalog, "Argument cacheCatalog must not be null");
+            this.catalogList.add(0, cacheCatalog);
+            return this;
+        }
+
+        public Builder addCatalog(CatalogInterface catalog) {
+            Assert.notNull(catalog, "Argument catalog must not be null");
             this.catalogList.add(catalog);
             return this;
         }
 
         public CatalogHandler build() {
-            Assert.isTrue(!this.catalogList.isEmpty(), "cache must not be null");
+            this.catalogList.add(this.baseCatalog);
 
-            Iterator<CatalogInterface> list = this.catalogList.iterator();
-            CatalogInterface catalog = list.next();
-            while (list.hasNext()) {
-                CatalogInterface nextCatalog = list.next();
-                if (nextCatalog != null) {
-                    catalog.nextHandler(nextCatalog);
+            Iterator<CatalogInterface> iterator = this.catalogList.iterator();
+            CatalogInterface current;
+            CatalogInterface next;
+            CatalogInterface catalog = iterator.next();
+
+            if (iterator.hasNext()) {
+                current = catalog;
+                while (iterator.hasNext()) {
+                    next = iterator.next();
+                    current.nextHandler(next);
+                    current = next;
                 }
             }
+
             catalog.build();
             return new CatalogHandler(catalog);
         }

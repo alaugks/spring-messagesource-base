@@ -41,9 +41,8 @@ public class MessageConfig {
 
         return new BaseTranslationMessageSource(
             CatalogHandler
-                .builder()
-                .addHandler(
-                    new Catalog(
+                .builder(
+                   new Catalog(
                         translations,
                         Locale.forLanguageTag("en")
                     )

@@ -21,9 +21,9 @@ public final class Catalog extends CatalogAbstract {
     }
 
     public Catalog(List<Translation> translations, Locale defaultLocale, String defaultDomain) {
-        Assert.notNull(translations, "translations must not be null");
-        Assert.notNull(defaultLocale, "defaultLocale must not be null");
-        Assert.notNull(defaultDomain, "defaultDomain must not be null");
+        Assert.notNull(translations, "Argument translations must not be null");
+        Assert.notNull(defaultLocale, "Argument defaultLocale must not be null");
+        Assert.notNull(defaultDomain, "Argument defaultDomain must not be null");
 
         this.catalogMap = new HashMap<>();
         this.translations = translations;
