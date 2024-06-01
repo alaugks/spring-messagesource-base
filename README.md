@@ -12,7 +12,7 @@
     <dependency>
         <groupId>io.github.alaugks</groupId>
         <artifactId>spring-messagesource-base</artifactId>
-        <version>0.0.3-SNAPSHOT</version>
+        <version>0.1.0.1-SNAPSHOT</version>
     </dependency>
 </dependencies>
 ```
