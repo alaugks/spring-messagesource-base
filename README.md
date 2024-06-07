@@ -15,6 +15,14 @@
         <version>1.0.0.rc1-SNAPSHOT</version>
     </dependency>
 </dependencies>
+
+<!-- Define SNAPSHOT repository  -->
+<repositories>
+    <repository>
+        <id>ossrh-snapshot</id>
+        <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+    </repository>
+</repositories>
 ```
 
 ## MessageSource Configuration
