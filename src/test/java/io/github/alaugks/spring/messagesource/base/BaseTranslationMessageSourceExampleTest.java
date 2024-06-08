@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.github.alaugks.spring.messagesource.base.catalog.Catalog;
 import io.github.alaugks.spring.messagesource.base.catalog.CatalogHandler;
-import io.github.alaugks.spring.messagesource.base.records.Translation;
+import io.github.alaugks.spring.messagesource.base.records.TransUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -24,33 +24,33 @@ class BaseTranslationMessageSourceExampleTest {
 
     public MessageSource messageSource() {
 
-        List<Translation> translations = new ArrayList<>();
+        List<TransUnit> transUnits = new ArrayList<>();
 
         var localeEn = Locale.forLanguageTag("en");
-        translations.add(new Translation(localeEn, "headline", "Headline"));
-        translations.add(new Translation(localeEn, "postcode", "Postcode"));
-        translations.add(new Translation(localeEn, "email-notice", "Your email {0} has been registered."));
-        translations.add(new Translation(localeEn, "default-message", "This is a default message."));
-        translations.add(new Translation(localeEn, "headline", "Payment", "payment"));
-        translations.add(new Translation(localeEn, "expiry_date", "Expiry date", "payment"));
+        transUnits.add(new TransUnit(localeEn, "headline", "Headline"));
+        transUnits.add(new TransUnit(localeEn, "postcode", "Postcode"));
+        transUnits.add(new TransUnit(localeEn, "email-notice", "Your email {0} has been registered."));
+        transUnits.add(new TransUnit(localeEn, "default-message", "This is a default message."));
+        transUnits.add(new TransUnit(localeEn, "headline", "Payment", "payment"));
+        transUnits.add(new TransUnit(localeEn, "expiry_date", "Expiry date", "payment"));
 
         var localeEnUs = Locale.forLanguageTag("en-US");
-        translations.add(new Translation(localeEnUs, "postcode", "Zip code"));
-        translations.add(new Translation(localeEnUs, "expiry_date", "Expiration date", "payment"));
+        transUnits.add(new TransUnit(localeEnUs, "postcode", "Zip code"));
+        transUnits.add(new TransUnit(localeEnUs, "expiry_date", "Expiration date", "payment"));
 
         var localeDe = Locale.forLanguageTag("de");
-        translations.add(new Translation(localeDe, "headline", "Überschrift"));
-        translations.add(new Translation(localeDe, "postcode", "Postleitzahl"));
-        translations.add(new Translation(localeDe, "email-notice", "Ihre E-Mail {0} wurde registriert."));
-        translations.add(new Translation(localeDe, "default-message", "Das ist ein Standardtext."));
-        translations.add(new Translation(localeDe, "headline", "Zahlung", "payment"));
-        translations.add(new Translation(localeDe, "expiry_date", "Ablaufdatum", "payment"));
+        transUnits.add(new TransUnit(localeDe, "headline", "Überschrift"));
+        transUnits.add(new TransUnit(localeDe, "postcode", "Postleitzahl"));
+        transUnits.add(new TransUnit(localeDe, "email-notice", "Ihre E-Mail {0} wurde registriert."));
+        transUnits.add(new TransUnit(localeDe, "default-message", "Das ist ein Standardtext."));
+        transUnits.add(new TransUnit(localeDe, "headline", "Zahlung", "payment"));
+        transUnits.add(new TransUnit(localeDe, "expiry_date", "Ablaufdatum", "payment"));
 
         return new BaseTranslationMessageSource(
             CatalogHandler
                 .builder(
                     new Catalog(
-                        translations,
+                        transUnits,
                         Locale.forLanguageTag("en")
                     )
                 )

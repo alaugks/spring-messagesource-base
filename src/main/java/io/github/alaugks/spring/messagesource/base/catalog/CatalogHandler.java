@@ -1,10 +1,10 @@
 package io.github.alaugks.spring.messagesource.base.catalog;
 
+import io.github.alaugks.spring.messagesource.base.records.TransUnitCatalog;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import org.springframework.util.Assert;
 
 public final class CatalogHandler implements CatalogHandlerInterface {
@@ -64,7 +64,7 @@ public final class CatalogHandler implements CatalogHandlerInterface {
     }
 
     @Override
-    public Map<String, Map<String, String>> getAll() {
+    public List<TransUnitCatalog> getAll() {
         return this.catalog.getAll();
     }
 

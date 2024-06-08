@@ -1,7 +1,9 @@
 package io.github.alaugks.spring.messagesource.base.catalog;
 
 import io.github.alaugks.spring.messagesource.base.BaseTranslationMessageSource;
-import io.github.alaugks.spring.messagesource.base.records.Translation;
+import io.github.alaugks.spring.messagesource.base.records.TransUnitCatalog;
+import io.github.alaugks.spring.messagesource.base.records.TransUnit;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -14,28 +16,38 @@ public final class Catalog extends CatalogAbstract {
     private final HashMap<String, Map<String, String>> catalogMap;
     private final Locale defaultLocale;
     private final String defaultDomain;
-    private final List<Translation> translations;
+    private final List<TransUnit> transUnits;
 
-    public Catalog(List<Translation> translations, Locale defaultLocale) {
-        this(translations, defaultLocale, BaseTranslationMessageSource.DEFAULT_DOMAIN);
+    public Catalog(List<TransUnit> transUnits, Locale defaultLocale) {
+        this(transUnits, defaultLocale, BaseTranslationMessageSource.DEFAULT_DOMAIN);
     }
 
-    public Catalog(List<Translation> translations, Locale defaultLocale, String defaultDomain) {
-        Assert.notNull(translations, "Argument translations must not be null");
+    public Catalog(List<TransUnit> transUnits, Locale defaultLocale, String defaultDomain) {
+        Assert.notNull(transUnits, "Argument transUnits must not be null");
         Assert.notNull(defaultLocale, "Argument defaultLocale must not be null");
         Assert.notNull(defaultDomain, "Argument defaultDomain must not be null");
 
         this.catalogMap = new HashMap<>();
-        this.translations = translations;
+        this.transUnits = transUnits;
         this.defaultLocale = defaultLocale;
         this.defaultDomain = defaultDomain;
 
     }
 
     @Override
-    public Map<String, Map<String, String>> getAll() {
+    public List<TransUnitCatalog> getAll() {
         if (!this.catalogMap.isEmpty()) {
-            return this.catalogMap;
+            List<TransUnitCatalog> transUnitCatalogs = new ArrayList<>();
+            this.catalogMap.forEach((localeCode, transUnit) -> transUnit.forEach((code, value) ->
+                transUnitCatalogs.add(
+                    new TransUnitCatalog(
+                        Locale.forLanguageTag(localeCode),
+                        code,
+                        value
+                    )
+                )
+            ));
+            return transUnitCatalogs;
         }
         return super.getAll();
     }
@@ -58,16 +70,21 @@ public final class Catalog extends CatalogAbstract {
     @Override
     public void build() {
         super.build();
-        this.translations.forEach(t -> this.put(t.locale(), t.domain(), t.code(), t.value()));
+        this.transUnits.forEach(t -> this.put(t.locale(), t.code(), t.value(), t.domain()));
     }
 
-    private void put(Locale locale, String domain, String code, String value) {
+    private void put(Locale locale, String code, String value, String domain) {
         if (!locale.toString().isEmpty() && !code.isEmpty()) {
+            if (domain == null) {
+                domain = BaseTranslationMessageSource.DEFAULT_DOMAIN;
+            }
+
             String localeKey = super.localeToLocaleKey(locale);
             this.catalogMap.putIfAbsent(
                 localeKey,
                 new HashMap<>()
             );
+
             this.catalogMap.get(localeKey).putIfAbsent(
                 concatCode(domain, code),
                 value

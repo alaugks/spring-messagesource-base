@@ -5,10 +5,15 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import io.github.alaugks.spring.messagesource.base.records.TransUnitCatalog;
 import java.util.Locale;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
 
 @SuppressWarnings("java:S5778")
@@ -28,20 +33,6 @@ class CatalogCacheTest {
         cache.put("de|domain.d_de_1", "value_d_de_1");
 
         this.catalogCache = new CatalogCache(cache);
-    }
-
-    @Test
-    void test_getAll() {
-        var all = this.catalogCache.getAll();
-        var transEn = all.get(Locale.forLanguageTag("en").toString());
-        var transDe = all.get(Locale.forLanguageTag("de").toString());
-
-        assertEquals("value_m_en_1", transEn.get("messages.m_en_1"));
-        assertEquals("value_m_en_2", transEn.get("messages.m_en_2"));
-        assertEquals("value_d_en_1", transEn.get("domain.d_en_1"));
-        assertEquals("value_m_de_1", transDe.get("messages.m_de_1"));
-        assertEquals("value_m_de_2", transDe.get("messages.m_de_2"));
-        assertEquals("value_d_de_1", transDe.get("domain.d_de_1"));
     }
 
     @Test
@@ -68,5 +59,28 @@ class CatalogCacheTest {
         } catch (IllegalArgumentException e) {
             assertInstanceOf(IllegalArgumentException.class, e);
         }
+    }
+
+    @ParameterizedTest()
+    @MethodSource("dataProvider_getAll")
+    void test_getAll(String locale, String code, String expected) {
+        for (TransUnitCatalog translation : this.catalogCache.getAll()) {
+            if (translation.locale().toString().equals(locale) && translation.code().equals(code)) {
+                assertEquals(expected, translation.value());
+                return;
+            }
+        }
+        fail(String.format("Expected failed on %s", code));
+    }
+
+    private static Stream<Arguments> dataProvider_getAll() {
+        return Stream.of(
+            Arguments.of("en", "messages.m_en_1", "value_m_en_1"),
+            Arguments.of("en", "messages.m_en_2", "value_m_en_2"),
+            Arguments.of("en", "domain.d_en_1", "value_d_en_1"),
+            Arguments.of("de", "messages.m_de_1", "value_m_de_1"),
+            Arguments.of("de", "messages.m_de_2", "value_m_de_2"),
+            Arguments.of("de", "domain.d_de_1", "value_d_de_1")
+        );
     }
 }

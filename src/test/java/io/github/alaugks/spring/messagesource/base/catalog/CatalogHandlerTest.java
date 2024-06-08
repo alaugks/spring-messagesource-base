@@ -3,7 +3,7 @@ package io.github.alaugks.spring.messagesource.base.catalog;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import io.github.alaugks.spring.messagesource.base.records.Translation;
+import io.github.alaugks.spring.messagesource.base.records.TransUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,16 +22,24 @@ class CatalogHandlerTest {
     void test_catalog() {
         String domain = "messages";
         String key = domain + ".key";
-        List<Translation> translations = new ArrayList<>();
-        translations.add(new Translation(this.locale, "key", "from_base_catalog"));
-        var baseCatalog = new Catalog(translations, this.locale);
+        List<TransUnit> transUnits = new ArrayList<>();
+        transUnits.add(new TransUnit(this.locale, "key", "from_base_catalog"));
+        var baseCatalog = new Catalog(transUnits, this.locale);
 
         var catalogHandler = CatalogHandler
             .builder(baseCatalog)
             .build();
 
         assertEquals("from_base_catalog", catalogHandler.get(this.locale, key));
-        assertEquals("from_base_catalog", catalogHandler.getAll().get("en").get(key));
+        assertEquals(
+            "from_base_catalog",
+            catalogHandler.getAll()
+                .stream()
+                .filter(t -> t.code().equals(key) && t.locale().toString().equals("en"))
+                .findFirst().get()
+                .value()
+        );
+
     }
 
     @Test
@@ -39,9 +47,9 @@ class CatalogHandlerTest {
         String domain = "messages";
         String key = domain + ".key";
         String localeKey = "en|" + key;
-        List<Translation> translations = new ArrayList<>();
-        translations.add(new Translation(this.locale, "key", "from_base_catalog"));
-        var baseCatalog = new Catalog(translations, this.locale);
+        List<TransUnit> transUnits = new ArrayList<>();
+        transUnits.add(new TransUnit(this.locale, "key", "from_base_catalog"));
+        var baseCatalog = new Catalog(transUnits, this.locale);
         var cache = new ConcurrentMapCache("text-cache");
         var cacheCatalog = new CatalogCache(cache);
 
@@ -74,7 +82,14 @@ class CatalogHandlerTest {
         // Overwrite cacheItem to test translation is from Cache
         cache.put(localeKey, "value_catalog_cache");
         assertEquals("value_catalog_cache", catalogHandler.get(locale, key));
-        assertEquals("value_catalog_cache", catalogHandler.getAll().get("en").get(key));
+        assertEquals(
+            "value_catalog_cache",
+            catalogHandler.getAll()
+                .stream()
+                .filter(t -> t.code().equals(key) && t.locale().toString().equals("en"))
+                .findFirst().get()
+                .value()
+        );
     }
 
     @Test
@@ -106,6 +121,7 @@ class CatalogHandlerTest {
     }
 
     static class CatalogTestCache extends CatalogAbstract {
+
         @Override
         public String get(Locale locale, String code) {
             return "cache_" + super.get(locale, code);
@@ -113,6 +129,7 @@ class CatalogHandlerTest {
     }
 
     static class CatalogTestFoo extends CatalogAbstract {
+
         @Override
         public String get(Locale locale, String code) {
             return "foo_" + super.get(locale, code);
@@ -120,6 +137,7 @@ class CatalogHandlerTest {
     }
 
     static class CatalogTestBar extends CatalogAbstract {
+
         @Override
         public String get(Locale locale, String code) {
             return "bar_" + super.get(locale, code);
@@ -127,6 +145,7 @@ class CatalogHandlerTest {
     }
 
     static class CatalogTestBase extends CatalogAbstract {
+
         @Override
         public String get(Locale locale, String code) {
             return "base";

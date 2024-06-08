@@ -1,8 +1,8 @@
 package io.github.alaugks.spring.messagesource.base.catalog;
 
-import java.util.HashMap;
+import io.github.alaugks.spring.messagesource.base.records.TransUnitCatalog;
+import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 abstract class CatalogAbstract implements CatalogInterface {
 
@@ -14,9 +14,9 @@ abstract class CatalogAbstract implements CatalogInterface {
     }
 
     @Override
-    public Map<String, Map<String, String>> getAll() {
+    public List<TransUnitCatalog> getAll() {
         if (this.nextHandler == null) {
-            return new HashMap<>();
+            return List.of();
         }
 
         return this.nextHandler.getAll();

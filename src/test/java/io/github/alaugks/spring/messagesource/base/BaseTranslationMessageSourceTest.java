@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.github.alaugks.spring.messagesource.base.catalog.Catalog;
 import io.github.alaugks.spring.messagesource.base.catalog.CatalogHandler;
-import io.github.alaugks.spring.messagesource.base.records.Translation;
+import io.github.alaugks.spring.messagesource.base.records.TransUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -34,17 +34,17 @@ class BaseTranslationMessageSourceTest {
 
     @BeforeAll
     static void beforeAll() {
-        List<Translation> translations = new ArrayList<>();
-        translations.add(new Translation(Locale.forLanguageTag("en"), "hello_world", "Hello World (messages / en)"));
-        translations.add(new Translation(Locale.forLanguageTag("de"), "hello_world", "Hallo Welt (messages / de)"));
-        translations.add(new Translation(Locale.forLanguageTag("en"), "roadrunner", "Road Runner and Wile E. Coyote"));
-        translations.add(new Translation(Locale.forLanguageTag("de"), "roadrunner", "Road Runner und Wile E. Coyote"));
-        translations.add(new Translation(Locale.forLanguageTag("en"), "bar", "Placeholder", "foo"));
-        translations.add(new Translation(Locale.forLanguageTag("de"), "bar", "Platzhalter", "foo"));
+        List<TransUnit> transUnits = new ArrayList<>();
+        transUnits.add(new TransUnit(Locale.forLanguageTag("en"), "hello_world", "Hello World (messages / en)"));
+        transUnits.add(new TransUnit(Locale.forLanguageTag("de"), "hello_world", "Hallo Welt (messages / de)"));
+        transUnits.add(new TransUnit(Locale.forLanguageTag("en"), "roadrunner", "Road Runner and Wile E. Coyote"));
+        transUnits.add(new TransUnit(Locale.forLanguageTag("de"), "roadrunner", "Road Runner und Wile E. Coyote"));
+        transUnits.add(new TransUnit(Locale.forLanguageTag("en"), "bar", "Placeholder", "foo"));
+        transUnits.add(new TransUnit(Locale.forLanguageTag("de"), "bar", "Platzhalter", "foo"));
 
         messageSource = new BaseTranslationMessageSource(
             CatalogHandler
-                .builder(new Catalog(translations, Locale.forLanguageTag("en")))
+                .builder(new Catalog(transUnits, Locale.forLanguageTag("en")))
                 .build()
         );
     }
@@ -289,15 +289,15 @@ class BaseTranslationMessageSourceTest {
 
     @Test
     void test_messagesFormat_choice() {
-        List<Translation> translations = new ArrayList<>();
-        translations.add(
-            new Translation(
+        List<TransUnit> transUnits = new ArrayList<>();
+        transUnits.add(
+            new TransUnit(
                 Locale.forLanguageTag("en"), "format_choice",
                 "There {0,choice,0#are no files|1#is one file|1<are {0,number,integer} files}."
             )
         );
-        translations.add(
-            new Translation(
+        transUnits.add(
+            new TransUnit(
                 Locale.forLanguageTag("de"), "format_choice",
                 "Es gibt {0,choice,0#keine Datei|1#eine Datei|1<{0,number,integer} Dateien}."
             )
@@ -305,7 +305,7 @@ class BaseTranslationMessageSourceTest {
 
         var messageSourceChoice = new BaseTranslationMessageSource(
             CatalogHandler
-                .builder(new Catalog(translations, Locale.forLanguageTag("en")))
+                .builder(new Catalog(transUnits, Locale.forLanguageTag("en")))
                 .build()
         );
 

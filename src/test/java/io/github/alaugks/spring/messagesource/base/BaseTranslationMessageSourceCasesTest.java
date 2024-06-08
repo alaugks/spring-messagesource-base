@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.alaugks.spring.messagesource.base.catalog.Catalog;
 import io.github.alaugks.spring.messagesource.base.catalog.CatalogHandler;
-import io.github.alaugks.spring.messagesource.base.records.Translation;
+import io.github.alaugks.spring.messagesource.base.records.TransUnit;
 import io.github.alaugks.spring.messagesource.base.records.TranslationFile;
 import io.github.alaugks.spring.messagesource.base.ressources.ResourcesLoader;
 import java.io.IOException;
@@ -27,7 +27,7 @@ class BaseTranslationMessageSourceCasesTest {
     MessageSource messageSource;
 
     public BaseTranslationMessageSourceCasesTest() throws IOException {
-        List<Translation> translations = new ArrayList<>();
+        List<TransUnit> transUnits = new ArrayList<>();
         var resourcesLoader = new ResourcesLoader(
             Locale.forLanguageTag("en"),
             new HashSet<>(List.of("translations_example/*")),
@@ -40,8 +40,8 @@ class BaseTranslationMessageSourceCasesTest {
             Map<String, Object> items = mapper.convertValue(mapper.readTree(json), new TypeReference<>() {});
 
             for (Map.Entry<String, Object> item : items.entrySet()) {
-                translations.add(
-                    new Translation(
+                transUnits.add(
+                    new TransUnit(
                         file.locale(), item.getKey(), item.getValue().toString(), file.domain()
                     )
                 );
@@ -50,7 +50,7 @@ class BaseTranslationMessageSourceCasesTest {
 
         this.messageSource = new BaseTranslationMessageSource(
             CatalogHandler
-                .builder(new Catalog(translations, Locale.forLanguageTag("en")))
+                .builder(new Catalog(transUnits, Locale.forLanguageTag("en")))
                 .build()
         );
 
