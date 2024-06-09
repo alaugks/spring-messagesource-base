@@ -37,9 +37,9 @@ public class CatalogBuilder {
             return this;
         }
 
-        public Builder catalogCache(CatalogInterface cacheCatalog) {
-            Assert.notNull(cacheCatalog, "Argument cacheCatalog must not be null");
-            this.catalogCache = cacheCatalog;
+        public Builder catalogCache(CatalogInterface catalogCache) {
+            Assert.notNull(catalogCache, "Argument catalogCache must not be null");
+            this.catalogCache = catalogCache;
             return this;
         }
 
