@@ -9,24 +9,36 @@ import io.github.alaugks.spring.messagesource.base.catalog.CatalogHandler;
 import io.github.alaugks.spring.messagesource.base.records.TransUnit;
 import io.github.alaugks.spring.messagesource.base.records.TranslationFile;
 import io.github.alaugks.spring.messagesource.base.ressources.ResourcesLoader;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.context.MessageSource;
+import org.springframework.context.support.ResourceBundleMessageSource;
 
-class BaseTranslationMessageSourceCasesTest {
+class BaseTranslationMessageSourceBehaviourTest {
 
-    MessageSource messageSource;
+    static MessageSource messageSource;
+    static ResourceBundleMessageSource resourceBundleMessageSource;
 
-    public BaseTranslationMessageSourceCasesTest() throws IOException {
+    @BeforeAll
+    static void beforeAll() throws IOException {
+
+        Map<String, Properties> messages = new HashMap<>();
+        Locale defaultLocale = Locale.forLanguageTag("en");
+
         List<TransUnit> transUnits = new ArrayList<>();
         var resourcesLoader = new ResourcesLoader(
             Locale.forLanguageTag("en"),
@@ -37,9 +49,15 @@ class BaseTranslationMessageSourceCasesTest {
         for (TranslationFile file : resourcesLoader.getTranslationFiles()) {
             String json = new String(file.inputStream().readAllBytes(), StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
-            Map<String, Object> items = mapper.convertValue(mapper.readTree(json), new TypeReference<>() {});
+            Map<String, Object> items = mapper.convertValue(mapper.readTree(json), new TypeReference<>() {
+            });
 
             for (Map.Entry<String, Object> item : items.entrySet()) {
+                messages.putIfAbsent(file.locale().toString(), new Properties());
+                messages.get(file.locale().toString()).put(
+                    file.domain() + "." + item.getKey(),
+                    item.getValue().toString()
+                );
                 transUnits.add(
                     new TransUnit(
                         file.locale(), item.getKey(), item.getValue().toString(), file.domain()
@@ -48,18 +66,47 @@ class BaseTranslationMessageSourceCasesTest {
             }
         }
 
-        this.messageSource = new BaseTranslationMessageSource(
+        for (Map.Entry<String, Properties> entry : messages.entrySet()) {
+            entry.getValue().store(new FileOutputStream(
+                String.format(
+                    "src/test/resources/messages/messages%s.properties",
+                    !Objects.equals(entry.getKey(), defaultLocale.toString()) ? "_" + entry.getKey() : ""
+                )
+
+            ), null);
+        }
+
+        messageSource = new BaseTranslationMessageSource(
             CatalogHandler
-                .builder(new Catalog(transUnits, Locale.forLanguageTag("en")))
+                .builder(new Catalog(transUnits, defaultLocale))
                 .build()
         );
 
+        resourceBundleMessageSource = new ResourceBundleMessageSource();
+        resourceBundleMessageSource.setBasename("messages/messages");
+        resourceBundleMessageSource.setDefaultEncoding("UTF-8");
+        resourceBundleMessageSource.setDefaultLocale(Locale.forLanguageTag("en"));
     }
 
     @ParameterizedTest()
     @MethodSource("dataProvider_examples")
-    void test_complex_locale_region_fallback(String code, String locale, Object expected) {
-        String message = this.messageSource.getMessage(
+    void test_baseTranslationMessageSource(String code, String locale, Object expected) {
+        String message = messageSource.getMessage(
+            code,
+            null,
+            Locale.forLanguageTag(locale)
+        );
+        assertEquals(expected, message);
+    }
+
+    @ParameterizedTest()
+    @MethodSource("dataProvider_examples")
+    void test_resourceBundleMessageSource(String code, String locale, Object expected) {
+        if (!code.startsWith("messages.") && !code.startsWith("payment.")) {
+            code = "messages." + code;
+        }
+
+        String message = resourceBundleMessageSource.getMessage(
             code,
             null,
             Locale.forLanguageTag(locale)
