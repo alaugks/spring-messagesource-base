@@ -39,39 +39,39 @@ class CatalogTest {
     void test_fallback() {
         // Domain foo
         Locale locale = Locale.forLanguageTag("en");
-        assertEquals("value_en_1", catalog.get(locale, "foo.key_1"));
-        assertEquals("value_en_1", catalog.get(locale, "key_1"));
+        assertEquals("value_en_1", catalog.resolve(locale, "foo.key_1"));
+        assertEquals("value_en_1", catalog.resolve(locale, "key_1"));
     }
 
     @Test
     void test_en() {
         // Domain foo
         Locale locale = Locale.forLanguageTag("en");
-        assertEquals("value_en_1", catalog.get(locale, "foo.key_1"));
+        assertEquals("value_en_1", catalog.resolve(locale, "foo.key_1"));
         // Domain bar
-        assertEquals("value_en_1", catalog.get(locale, "bar.key_1"));
+        assertEquals("value_en_1", catalog.resolve(locale, "bar.key_1"));
         // Domain foo
-        assertEquals("value_en_2", catalog.get(locale, "foo.key_2"));
+        assertEquals("value_en_2", catalog.resolve(locale, "foo.key_2"));
         // Domain bar
-        assertEquals("value_en_2", catalog.get(locale, "bar.key_2"));
+        assertEquals("value_en_2", catalog.resolve(locale, "bar.key_2"));
 
         // Domain bar
-        assertNull(catalog.get(locale, "bar.key_3"));
+        assertNull(catalog.resolve(locale, "bar.key_3"));
         // Domain foo
-        assertNull(catalog.get(locale, "foo.key_3"));
+        assertNull(catalog.resolve(locale, "foo.key_3"));
     }
 
     @Test
     void test_enUk_withDash() {
         Locale locale = Locale.forLanguageTag("en-US");
         // Domain foo
-        assertEquals("value_en_us_1", catalog.get(locale, "foo.key_1"));
+        assertEquals("value_en_us_1", catalog.resolve(locale, "foo.key_1"));
     }
 
     @Test
     void test_get_paramValuesEmpty() {
-        assertNull(catalog.get(Locale.forLanguageTag("en"), ""));
-        assertNull(catalog.get(Locale.forLanguageTag(""), "messages.m_en_1"));
+        assertNull(catalog.resolve(Locale.forLanguageTag("en"), ""));
+        assertNull(catalog.resolve(Locale.forLanguageTag(""), "messages.m_en_1"));
     }
 
 }

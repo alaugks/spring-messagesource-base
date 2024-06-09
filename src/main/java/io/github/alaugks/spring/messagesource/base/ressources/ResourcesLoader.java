@@ -1,6 +1,6 @@
 package io.github.alaugks.spring.messagesource.base.ressources;
 
-import io.github.alaugks.spring.messagesource.base.exception.BaseMessageSourceRuntimeException;
+import io.github.alaugks.spring.messagesource.base.exception.CatalogMessageSourceRuntimeException;
 import io.github.alaugks.spring.messagesource.base.records.Filename;
 import io.github.alaugks.spring.messagesource.base.records.TranslationFile;
 import java.io.IOException;
@@ -46,7 +46,7 @@ public final class ResourcesLoader {
 
             return translationTranslationFiles;
         } catch (IOException e) {
-            throw new BaseMessageSourceRuntimeException(e);
+            throw new CatalogMessageSourceRuntimeException(e);
         }
     }
 

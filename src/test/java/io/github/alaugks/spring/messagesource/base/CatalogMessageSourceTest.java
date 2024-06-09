@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.github.alaugks.spring.messagesource.base.catalog.Catalog;
-import io.github.alaugks.spring.messagesource.base.catalog.CatalogHandler;
 import io.github.alaugks.spring.messagesource.base.records.TransUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +27,7 @@ import org.springframework.context.support.DefaultMessageSourceResolvable;
  */
 @SuppressWarnings({"java:S4144"})
 @TestMethodOrder(OrderAnnotation.class)
-class BaseTranslationMessageSourceTest {
+class CatalogMessageSourceTest {
 
     protected static MessageSource messageSource;
 
@@ -42,11 +41,7 @@ class BaseTranslationMessageSourceTest {
         transUnits.add(new TransUnit(Locale.forLanguageTag("en"), "bar", "Placeholder", "foo"));
         transUnits.add(new TransUnit(Locale.forLanguageTag("de"), "bar", "Platzhalter", "foo"));
 
-        messageSource = new BaseTranslationMessageSource(
-            CatalogHandler
-                .builder(new Catalog(transUnits, Locale.forLanguageTag("en")))
-                .build()
-        );
+        messageSource = CatalogMessageSource.builder(new Catalog(transUnits, Locale.forLanguageTag("en"))).build();
     }
 
     @Test
@@ -303,11 +298,9 @@ class BaseTranslationMessageSourceTest {
             )
         );
 
-        var messageSourceChoice = new BaseTranslationMessageSource(
-            CatalogHandler
-                .builder(new Catalog(transUnits, Locale.forLanguageTag("en")))
-                .build()
-        );
+        var messageSourceChoice = CatalogMessageSource
+            .builder(new Catalog(transUnits, Locale.forLanguageTag("en")))
+            .build();
 
         assertEquals("There are 10,000 files.", messageSourceChoice.getMessage(
             "format_choice",

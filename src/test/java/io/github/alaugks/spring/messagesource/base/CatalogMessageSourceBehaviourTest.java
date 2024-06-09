@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.alaugks.spring.messagesource.base.catalog.Catalog;
-import io.github.alaugks.spring.messagesource.base.catalog.CatalogHandler;
 import io.github.alaugks.spring.messagesource.base.records.TransUnit;
 import io.github.alaugks.spring.messagesource.base.records.TranslationFile;
 import io.github.alaugks.spring.messagesource.base.ressources.ResourcesLoader;
@@ -28,7 +27,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.context.MessageSource;
 import org.springframework.context.support.ResourceBundleMessageSource;
 
-class BaseTranslationMessageSourceBehaviourTest {
+class CatalogMessageSourceBehaviourTest {
 
     static MessageSource messageSource;
     static ResourceBundleMessageSource resourceBundleMessageSource;
@@ -72,15 +71,10 @@ class BaseTranslationMessageSourceBehaviourTest {
                     "src/test/resources/messages/messages%s.properties",
                     !Objects.equals(entry.getKey(), defaultLocale.toString()) ? "_" + entry.getKey() : ""
                 )
-
             ), null);
         }
 
-        messageSource = new BaseTranslationMessageSource(
-            CatalogHandler
-                .builder(new Catalog(transUnits, defaultLocale))
-                .build()
-        );
+        messageSource = CatalogMessageSource.builder(new Catalog(transUnits, defaultLocale)).build();
 
         resourceBundleMessageSource = new ResourceBundleMessageSource();
         resourceBundleMessageSource.setBasename("messages/messages");

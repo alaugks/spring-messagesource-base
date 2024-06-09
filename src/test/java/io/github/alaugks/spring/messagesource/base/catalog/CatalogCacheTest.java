@@ -37,18 +37,18 @@ class CatalogCacheTest {
 
     @Test
     void test_get() {
-        assertEquals("value_m_en_1", catalogCache.get(Locale.forLanguageTag("en"), "messages.m_en_1"));
+        assertEquals("value_m_en_1", catalogCache.resolve(Locale.forLanguageTag("en"), "messages.m_en_1"));
     }
 
     @Test
     void test_get_notExists() {
-        assertNull(catalogCache.get(Locale.forLanguageTag("en"), "messages.not_exists"));
+        assertNull(catalogCache.resolve(Locale.forLanguageTag("en"), "messages.not_exists"));
     }
 
     @Test
     void test_get_paramValuesEmpty() {
-        assertNull(catalogCache.get(Locale.forLanguageTag("en"), ""));
-        assertNull(catalogCache.get(Locale.forLanguageTag(""), "messages.m_en_1"));
+        assertNull(catalogCache.resolve(Locale.forLanguageTag("en"), ""));
+        assertNull(catalogCache.resolve(Locale.forLanguageTag(""), "messages.m_en_1"));
     }
 
     @Test
@@ -62,8 +62,8 @@ class CatalogCacheTest {
     }
 
     @ParameterizedTest()
-    @MethodSource("dataProvider_getAll")
-    void test_getAll(String locale, String code, String expected) {
+    @MethodSource("dataProvider_getAllCatalogTransUnits")
+    void test_getAllCatalogTransUnits(String locale, String code, String expected) {
         for (TransUnitCatalog translation : this.catalogCache.getAll()) {
             if (translation.locale().toString().equals(locale) && translation.code().equals(code)) {
                 assertEquals(expected, translation.value());
@@ -73,7 +73,7 @@ class CatalogCacheTest {
         fail(String.format("Expected failed on %s", code));
     }
 
-    private static Stream<Arguments> dataProvider_getAll() {
+    private static Stream<Arguments> dataProvider_getAllCatalogTransUnits() {
         return Stream.of(
             Arguments.of("en", "messages.m_en_1", "value_m_en_1"),
             Arguments.of("en", "messages.m_en_2", "value_m_en_2"),

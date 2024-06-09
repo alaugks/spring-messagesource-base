@@ -38,7 +38,7 @@ public final class CatalogCache extends CatalogAbstract {
     }
 
     @Override
-    public String get(Locale locale, String code) {
+    public String resolve(Locale locale, String code) {
 
         if (locale.toString().isEmpty() || code.isEmpty()) {
             return null;
@@ -54,7 +54,7 @@ public final class CatalogCache extends CatalogAbstract {
             return value;
         }
 
-        value = super.get(locale, code);
+        value = super.resolve(locale, code);
         if (value != null) {
             this.put(locale, code, value);
         }

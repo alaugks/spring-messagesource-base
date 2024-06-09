@@ -3,7 +3,6 @@ package io.github.alaugks.spring.messagesource.base;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.github.alaugks.spring.messagesource.base.catalog.Catalog;
-import io.github.alaugks.spring.messagesource.base.catalog.CatalogHandler;
 import io.github.alaugks.spring.messagesource.base.records.TransUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,11 +13,11 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.context.MessageSource;
 
-class BaseTranslationMessageSourceExampleTest {
+class CatalogMessageSourceExampleTest {
 
     MessageSource messageSource;
 
-    public BaseTranslationMessageSourceExampleTest() {
+    public CatalogMessageSourceExampleTest() {
         this.messageSource = this.messageSource();
     }
 
@@ -46,16 +45,7 @@ class BaseTranslationMessageSourceExampleTest {
         transUnits.add(new TransUnit(localeDe, "headline", "Zahlung", "payment"));
         transUnits.add(new TransUnit(localeDe, "expiry_date", "Ablaufdatum", "payment"));
 
-        return new BaseTranslationMessageSource(
-            CatalogHandler
-                .builder(
-                    new Catalog(
-                        transUnits,
-                        Locale.forLanguageTag("en")
-                    )
-                )
-                .build()
-        );
+        return CatalogMessageSource.builder(new Catalog(transUnits, Locale.forLanguageTag("en"))).build();
     }
 
 
@@ -76,8 +66,10 @@ class BaseTranslationMessageSourceExampleTest {
             Arguments.of("messages.headline", "en", "Headline", null),
             Arguments.of("postcode", "en", "Postcode", null),
             Arguments.of("messages.postcode", "en", "Postcode", null),
-            Arguments.of("email-notice", "en", "Your email foo@example.com has been registered.", new Object[] {"foo@example.com"}),
-            Arguments.of("messages.email-notice", "en", "Your email foo@example.com has been registered.", new Object[] {"foo@example.com"}),
+            Arguments.of("email-notice", "en", "Your email foo@example.com has been registered.",
+                new Object[]{"foo@example.com"}),
+            Arguments.of("messages.email-notice", "en", "Your email foo@example.com has been registered.",
+                new Object[]{"foo@example.com"}),
             Arguments.of("default-message", "en", "This is a default message.", null),
             Arguments.of("messages.default-message", "en", "This is a default message.", null),
             Arguments.of("payment.headline", "en", "Payment", null),
@@ -87,8 +79,10 @@ class BaseTranslationMessageSourceExampleTest {
             Arguments.of("messages.headline", "en-US", "Headline", null),
             Arguments.of("postcode", "en-US", "Zip code", null),
             Arguments.of("messages.postcode", "en-US", "Zip code", null),
-            Arguments.of("email-notice", "en-US", "Your email foo@example.com has been registered.", new Object[] {"foo@example.com"}),
-            Arguments.of("messages.email-notice", "en-US", "Your email foo@example.com has been registered.", new Object[] {"foo@example.com"}),
+            Arguments.of("email-notice", "en-US", "Your email foo@example.com has been registered.",
+                new Object[]{"foo@example.com"}),
+            Arguments.of("messages.email-notice", "en-US", "Your email foo@example.com has been registered.",
+                new Object[]{"foo@example.com"}),
             Arguments.of("default-message", "en-US", "This is a default message.", null),
             Arguments.of("messages.default-message", "en-US", "This is a default message.", null),
             Arguments.of("payment.headline", "en-US", "Payment", null),
@@ -98,8 +92,10 @@ class BaseTranslationMessageSourceExampleTest {
             Arguments.of("messages.headline", "de", "Überschrift", null),
             Arguments.of("postcode", "de", "Postleitzahl", null),
             Arguments.of("messages.postcode", "de", "Postleitzahl", null),
-            Arguments.of("email-notice", "de", "Ihre E-Mail foo@example.com wurde registriert.", new Object[] {"foo@example.com"}),
-            Arguments.of("messages.email-notice", "de", "Ihre E-Mail foo@example.com wurde registriert.", new Object[] {"foo@example.com"}),
+            Arguments.of("email-notice", "de", "Ihre E-Mail foo@example.com wurde registriert.",
+                new Object[]{"foo@example.com"}),
+            Arguments.of("messages.email-notice", "de", "Ihre E-Mail foo@example.com wurde registriert.",
+                new Object[]{"foo@example.com"}),
             Arguments.of("default-message", "de", "Das ist ein Standardtext.", null),
             Arguments.of("messages.default-message", "de", "Das ist ein Standardtext.", null),
             Arguments.of("payment.headline", "de", "Zahlung", null),
@@ -109,8 +105,10 @@ class BaseTranslationMessageSourceExampleTest {
             Arguments.of("messages.headline", "jp", "Headline", null),
             Arguments.of("postcode", "jp", "Postcode", null),
             Arguments.of("messages.postcode", "jp", "Postcode", null),
-            Arguments.of("email-notice", "jp", "Your email foo@example.com has been registered.", new Object[] {"foo@example.com"}),
-            Arguments.of("messages.email-notice", "jp", "Your email foo@example.com has been registered.", new Object[] {"foo@example.com"}),
+            Arguments.of("email-notice", "jp", "Your email foo@example.com has been registered.",
+                new Object[]{"foo@example.com"}),
+            Arguments.of("messages.email-notice", "jp", "Your email foo@example.com has been registered.",
+                new Object[]{"foo@example.com"}),
             Arguments.of("default-message", "jp", "This is a default message.", null),
             Arguments.of("messages.default-message", "jp", "This is a default message.", null),
             Arguments.of("payment.headline", "jp", "Payment", null),

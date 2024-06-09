@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import io.github.alaugks.spring.messagesource.base.exception.BaseMessageSourceRuntimeException;
+import io.github.alaugks.spring.messagesource.base.exception.CatalogMessageSourceRuntimeException;
 import io.github.alaugks.spring.messagesource.base.records.Filename;
 import org.junit.jupiter.api.Test;
 
@@ -28,6 +28,6 @@ class FilenameTest {
     void test_formatedException() {
         Filename filename = new Filename("messages", "en", "bar");
 
-        assertThrows(BaseMessageSourceRuntimeException.class, filename::locale);
+        assertThrows(CatalogMessageSourceRuntimeException.class, filename::locale);
     }
 }

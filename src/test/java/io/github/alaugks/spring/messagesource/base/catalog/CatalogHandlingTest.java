@@ -3,6 +3,7 @@ package io.github.alaugks.spring.messagesource.base.catalog;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import io.github.alaugks.spring.messagesource.base.CatalogMessageSource;
 import io.github.alaugks.spring.messagesource.base.records.TransUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.cache.Cache;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
 
-class CatalogHandlerTest {
+class CatalogHandlingTest {
 
     private final Locale locale = Locale.forLanguageTag("en");
 
@@ -26,9 +27,7 @@ class CatalogHandlerTest {
         transUnits.add(new TransUnit(this.locale, "key", "from_base_catalog"));
         var baseCatalog = new Catalog(transUnits, this.locale);
 
-        var catalogHandler = CatalogHandler
-            .builder(baseCatalog)
-            .build();
+        var catalogHandler = CatalogMessageSource.builder(baseCatalog).build();
 
         assertEquals("from_base_catalog", catalogHandler.get(this.locale, key));
         assertEquals(
@@ -57,10 +56,7 @@ class CatalogHandlerTest {
         var cacheBuffer = cacheToArray(cache);
         assertNull(cacheBuffer.get(localeKey));
 
-        var catalogHandler = CatalogHandler
-            .builder(baseCatalog)
-            .catalogCache(cacheCatalog)
-            .build();
+        var catalogHandler = CatalogMessageSource.builder(baseCatalog).catalogCache(cacheCatalog).build();
 
         // Exists item in Cache after build?
         assertEquals("from_base_catalog", cacheToArray(cache).get(localeKey));
@@ -92,63 +88,8 @@ class CatalogHandlerTest {
         );
     }
 
-    @Test
-    void test_addCatalog() {
-        var catalogHandler = CatalogHandler
-            .builder(new CatalogTestBase())
-            .addCatalog(new CatalogTestFoo())
-            .catalogCache(new CatalogTestCache())
-            .addCatalog(new CatalogTestBar())
-            .build();
-
-        assertEquals("cache_foo_bar_base", catalogHandler.get(Locale.forLanguageTag("en"), "key"));
-    }
-
-    @Test
-    void test_addCatalog_withoutCache() {
-        var catalogHandler = CatalogHandler
-            .builder(new CatalogTestBase())
-            .addCatalog(new CatalogTestFoo())
-            .addCatalog(new CatalogTestBar())
-            .build();
-
-        assertEquals("foo_bar_base", catalogHandler.get(Locale.forLanguageTag("en"), "key"));
-    }
-
     private static Map<Object, Object> cacheToArray(Cache cache) {
         var nativeCache = (ConcurrentHashMap<?, ?>) cache.getNativeCache();
         return new HashMap<>(nativeCache);
-    }
-
-    static class CatalogTestCache extends CatalogAbstract {
-
-        @Override
-        public String get(Locale locale, String code) {
-            return "cache_" + super.get(locale, code);
-        }
-    }
-
-    static class CatalogTestFoo extends CatalogAbstract {
-
-        @Override
-        public String get(Locale locale, String code) {
-            return "foo_" + super.get(locale, code);
-        }
-    }
-
-    static class CatalogTestBar extends CatalogAbstract {
-
-        @Override
-        public String get(Locale locale, String code) {
-            return "bar_" + super.get(locale, code);
-        }
-    }
-
-    static class CatalogTestBase extends CatalogAbstract {
-
-        @Override
-        public String get(Locale locale, String code) {
-            return "base";
-        }
     }
 }

@@ -10,7 +10,7 @@ public interface CatalogInterface {
 
     List<TransUnitCatalog> getAll();
 
-    String get(Locale locale, String code);
+    String resolve(Locale locale, String code);
 
     void build();
 }

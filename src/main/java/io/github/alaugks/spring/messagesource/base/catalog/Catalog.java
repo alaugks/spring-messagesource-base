@@ -1,8 +1,8 @@
 package io.github.alaugks.spring.messagesource.base.catalog;
 
-import io.github.alaugks.spring.messagesource.base.BaseTranslationMessageSource;
-import io.github.alaugks.spring.messagesource.base.records.TransUnitCatalog;
+import io.github.alaugks.spring.messagesource.base.CatalogMessageSource;
 import io.github.alaugks.spring.messagesource.base.records.TransUnit;
+import io.github.alaugks.spring.messagesource.base.records.TransUnitCatalog;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +19,7 @@ public final class Catalog extends CatalogAbstract {
     private final List<TransUnit> transUnits;
 
     public Catalog(List<TransUnit> transUnits, Locale defaultLocale) {
-        this(transUnits, defaultLocale, BaseTranslationMessageSource.DEFAULT_DOMAIN);
+        this(transUnits, defaultLocale, CatalogMessageSource.DEFAULT_DOMAIN);
     }
 
     public Catalog(List<TransUnit> transUnits, Locale defaultLocale, String defaultDomain) {
@@ -31,7 +31,6 @@ public final class Catalog extends CatalogAbstract {
         this.transUnits = transUnits;
         this.defaultLocale = defaultLocale;
         this.defaultDomain = defaultDomain;
-
     }
 
     @Override
@@ -53,18 +52,18 @@ public final class Catalog extends CatalogAbstract {
     }
 
     @Override
-    public String get(Locale locale, String code) {
+    public String resolve(Locale locale, String code) {
 
         if (locale.toString().isEmpty() || code.isEmpty()) {
             return null;
         }
 
-        String value = this.fromCatalogMap(locale, code);
+        String value = this.resolveCode(locale, code);
         if (value != null) {
             return value;
         }
 
-        return super.get(locale, code);
+        return super.resolve(locale, code);
     }
 
     @Override
@@ -76,7 +75,7 @@ public final class Catalog extends CatalogAbstract {
     private void put(Locale locale, String code, String value, String domain) {
         if (!locale.toString().isEmpty() && !code.isEmpty()) {
             if (domain == null) {
-                domain = BaseTranslationMessageSource.DEFAULT_DOMAIN;
+                domain = CatalogMessageSource.DEFAULT_DOMAIN;
             }
 
             String localeKey = super.localeToLocaleKey(locale);
@@ -92,41 +91,41 @@ public final class Catalog extends CatalogAbstract {
         }
     }
 
-    private String fromCatalogMap(Locale locale, String code) {
+    private String resolveCode(Locale locale, String code) {
         String value;
 
         // Code+LocaleRegion
-        value = this.findInCatalogMap(locale, code);
+        value = this.resolveCodeInCatalogMap(locale, code);
         if (value != null) {
             return value;
         }
 
         // Code+LocaleRegion / DomainCode+LanguageRegion
-        value = this.findInCatalogMap(locale, concatCode(this.defaultDomain, code));
+        value = this.resolveCodeInCatalogMap(locale, concatCode(this.defaultDomain, code));
         if (value != null) {
             return value;
         }
 
         // Code+Language / DomainCode+Language
-        value = this.findInCatalogMap(buildLocaleWithoutRegion(locale), code);
+        value = this.resolveCodeInCatalogMap(buildLocaleWithoutRegion(locale), code);
         if (value != null) {
             return value;
         }
 
         // Code+Language / DomainCode+Language
-        value = this.findInCatalogMap(buildLocaleWithoutRegion(locale), concatCode(this.defaultDomain, code));
+        value = this.resolveCodeInCatalogMap(buildLocaleWithoutRegion(locale), concatCode(this.defaultDomain, code));
         if (value != null) {
             return value;
         }
 
         // Code+DefaultLanguageRegion / DomainCode+DefaultLanguageRegion
-        value = this.findInCatalogMap(this.defaultLocale, code);
+        value = this.resolveCodeInCatalogMap(this.defaultLocale, code);
         if (value != null) {
             return value;
         }
 
         // Code+DefaultLanguageRegion / DomainCode+DefaultLanguageRegion
-        value = this.findInCatalogMap(this.defaultLocale, concatCode(this.defaultDomain, code));
+        value = this.resolveCodeInCatalogMap(this.defaultLocale, concatCode(this.defaultDomain, code));
         if (value != null) {
             return value;
         }
@@ -134,7 +133,7 @@ public final class Catalog extends CatalogAbstract {
         return value;
     }
 
-    public String findInCatalogMap(Locale locale, String code) {
+    public String resolveCodeInCatalogMap(Locale locale, String code) {
         String localeKey = super.localeToLocaleKey(locale);
         if (this.catalogMap.containsKey(localeKey)) {
             Map<String, String> languageCatalog = this.catalogMap.get(localeKey);
