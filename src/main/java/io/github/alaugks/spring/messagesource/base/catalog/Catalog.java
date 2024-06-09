@@ -1,6 +1,5 @@
 package io.github.alaugks.spring.messagesource.base.catalog;
 
-import io.github.alaugks.spring.messagesource.base.CatalogMessageSource;
 import io.github.alaugks.spring.messagesource.base.records.TransUnit;
 import io.github.alaugks.spring.messagesource.base.records.TransUnitCatalog;
 import java.util.ArrayList;
@@ -13,13 +12,14 @@ import org.springframework.util.Assert;
 
 public final class Catalog extends CatalogAbstract {
 
+    public static final String DEFAULT_DOMAIN = "messages";
     private final HashMap<String, Map<String, String>> catalogMap;
     private final Locale defaultLocale;
     private final String defaultDomain;
     private final List<TransUnit> transUnits;
 
     public Catalog(List<TransUnit> transUnits, Locale defaultLocale) {
-        this(transUnits, defaultLocale, CatalogMessageSource.DEFAULT_DOMAIN);
+        this(transUnits, defaultLocale, DEFAULT_DOMAIN);
     }
 
     public Catalog(List<TransUnit> transUnits, Locale defaultLocale, String defaultDomain) {
@@ -75,7 +75,7 @@ public final class Catalog extends CatalogAbstract {
     private void put(Locale locale, String code, String value, String domain) {
         if (!locale.toString().isEmpty() && !code.isEmpty()) {
             if (domain == null) {
-                domain = CatalogMessageSource.DEFAULT_DOMAIN;
+                domain = DEFAULT_DOMAIN;
             }
 
             String localeKey = super.localeToLocaleKey(locale);

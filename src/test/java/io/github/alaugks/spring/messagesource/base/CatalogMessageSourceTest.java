@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import io.github.alaugks.spring.messagesource.base.catalog.Catalog;
+import io.github.alaugks.spring.messagesource.base.catalog.CatalogBuilder;
 import io.github.alaugks.spring.messagesource.base.records.TransUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +41,9 @@ class CatalogMessageSourceTest {
         transUnits.add(new TransUnit(Locale.forLanguageTag("en"), "bar", "Placeholder", "foo"));
         transUnits.add(new TransUnit(Locale.forLanguageTag("de"), "bar", "Platzhalter", "foo"));
 
-        messageSource = CatalogMessageSource.builder(new Catalog(transUnits, Locale.forLanguageTag("en"))).build();
+        messageSource = new CatalogMessageSource(
+            CatalogBuilder.builder(transUnits, Locale.forLanguageTag("en")).build()
+        );
     }
 
     @Test
@@ -298,9 +300,10 @@ class CatalogMessageSourceTest {
             )
         );
 
-        var messageSourceChoice = CatalogMessageSource
-            .builder(new Catalog(transUnits, Locale.forLanguageTag("en")))
-            .build();
+        var messageSourceChoice = new CatalogMessageSource(
+            CatalogBuilder.builder(transUnits, Locale.forLanguageTag("en"))
+                .build()
+        );
 
         assertEquals("There are 10,000 files.", messageSourceChoice.getMessage(
             "format_choice",

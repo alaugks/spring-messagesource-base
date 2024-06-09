@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.alaugks.spring.messagesource.base.catalog.Catalog;
+import io.github.alaugks.spring.messagesource.base.catalog.CatalogBuilder;
 import io.github.alaugks.spring.messagesource.base.records.TransUnit;
 import io.github.alaugks.spring.messagesource.base.records.TranslationFile;
 import io.github.alaugks.spring.messagesource.base.ressources.ResourcesLoader;
@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.stream.Stream;
@@ -27,6 +28,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.context.MessageSource;
 import org.springframework.context.support.ResourceBundleMessageSource;
 
+@SuppressWarnings({"java:S125"})
 class CatalogMessageSourceBehaviourTest {
 
     static MessageSource messageSource;
@@ -66,15 +68,14 @@ class CatalogMessageSourceBehaviourTest {
         }
 
         for (Map.Entry<String, Properties> entry : messages.entrySet()) {
-            entry.getValue().store(new FileOutputStream(
-                String.format(
-                    "src/test/resources/messages/messages%s.properties",
-                    !Objects.equals(entry.getKey(), defaultLocale.toString()) ? "_" + entry.getKey() : ""
-                )
-            ), null);
+            writePropertiesFiles(entry, defaultLocale);
         }
 
-        messageSource = CatalogMessageSource.builder(new Catalog(transUnits, defaultLocale)).build();
+        messageSource = new CatalogMessageSource(
+            CatalogBuilder
+                .builder(transUnits, defaultLocale)
+                .build()
+        );
 
         resourceBundleMessageSource = new ResourceBundleMessageSource();
         resourceBundleMessageSource.setBasename("messages/messages");
@@ -160,5 +161,29 @@ class CatalogMessageSourceBehaviourTest {
             Arguments.of("payment.headline", "jp", "Payment (en)"),
             Arguments.of("payment.text", "jp", "Payment Text (en)")
         );
+    }
+
+    private static void writePropertiesFiles(Entry<String, Properties> entry, Locale defaultLocale) throws IOException {
+        //entry.getValue().store(new FileOutputStream(
+        //    String.format(
+        //        "src/test/resources/messages/messages%s.properties",
+        //        !Objects.equals(entry.getKey(), defaultLocale.toString()) ? "_" + entry.getKey() : ""
+        //    )
+        //), null);
+
+        String properties = "";
+        for (Entry<Object, Object> prop : entry.getValue().entrySet()) {
+            properties += prop.getKey() + "=" + prop.getValue() + "\n";
+        }
+
+        FileOutputStream outputStream = new FileOutputStream(
+            String.format(
+                "src/test/resources/messages/messages%s.properties",
+                !Objects.equals(entry.getKey(), defaultLocale.toString()) ? "_" + entry.getKey() : ""
+            )
+        );
+        byte[] strToBytes = properties.getBytes();
+        outputStream.write(strToBytes);
+        outputStream.close();
     }
 }

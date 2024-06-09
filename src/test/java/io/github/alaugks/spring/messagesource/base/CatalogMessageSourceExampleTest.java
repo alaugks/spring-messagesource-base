@@ -2,7 +2,8 @@ package io.github.alaugks.spring.messagesource.base;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import io.github.alaugks.spring.messagesource.base.catalog.Catalog;
+import io.github.alaugks.spring.messagesource.base.catalog.CatalogBuilder;
+import io.github.alaugks.spring.messagesource.base.catalog.CatalogCache;
 import io.github.alaugks.spring.messagesource.base.records.TransUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.context.MessageSource;
 
 class CatalogMessageSourceExampleTest {
@@ -45,7 +47,12 @@ class CatalogMessageSourceExampleTest {
         transUnits.add(new TransUnit(localeDe, "headline", "Zahlung", "payment"));
         transUnits.add(new TransUnit(localeDe, "expiry_date", "Ablaufdatum", "payment"));
 
-        return CatalogMessageSource.builder(new Catalog(transUnits, Locale.forLanguageTag("en"))).build();
+        return new CatalogMessageSource(
+            CatalogBuilder
+                .builder(transUnits, Locale.forLanguageTag("en"))
+                .catalogCache(new CatalogCache(new ConcurrentMapCache("my-cache")))
+                .build()
+        );
     }
 
 

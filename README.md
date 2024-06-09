@@ -65,14 +65,11 @@ public class MessageConfig {
         transUnits.add(new TransUnit(localeDe, "headline", "Zahlung", "payment"));
         transUnits.add(new TransUnit(localeDe, "expiry_date", "Ablaufdatum", "payment"));
 
-        return new BaseTranslationMessageSource(
-            CatalogHandler
-                .builder(
-                    new Catalog(
-                        transUnits,
-                        Locale.forLanguageTag("en")
-                    )
-                )
+        return new CatalogMessageSource(
+            CatalogBuilder
+                .builder(transUnits, Locale.forLanguageTag("en"))
+                .catalogCache(new CatalogCache(new ConcurrentMapCache("my-cache")))
+                //.defaultDomain(String defaultDomain)
                 .build()
         );
     }
