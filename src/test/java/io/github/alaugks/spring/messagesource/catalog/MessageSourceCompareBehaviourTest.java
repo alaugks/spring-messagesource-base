@@ -26,13 +26,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.context.MessageSource;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.context.support.ResourceBundleMessageSource;
 
 @SuppressWarnings({"java:S125"})
-class CatalogMessageSourceBehaviourTest {
+class MessageSourceCompareBehaviourTest {
 
-    static MessageSource messageSource;
+    static MessageSource catalogMessageSource;
     static ResourceBundleMessageSource resourceBundleMessageSource;
+    static ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource;
 
     @BeforeAll
     static void beforeAll() throws IOException {
@@ -71,7 +73,7 @@ class CatalogMessageSourceBehaviourTest {
             writePropertiesFiles(entry, defaultLocale);
         }
 
-        messageSource = new CatalogMessageSource(
+        catalogMessageSource = new CatalogMessageSource(
             CatalogBuilder
                 .builder(transUnits, defaultLocale)
                 .build()
@@ -81,12 +83,17 @@ class CatalogMessageSourceBehaviourTest {
         resourceBundleMessageSource.setBasename("messages/messages");
         resourceBundleMessageSource.setDefaultEncoding("UTF-8");
         resourceBundleMessageSource.setDefaultLocale(Locale.forLanguageTag("en"));
+
+        reloadableResourceBundleMessageSource = new ReloadableResourceBundleMessageSource();
+        reloadableResourceBundleMessageSource.setBasename("messages/messages");
+        reloadableResourceBundleMessageSource.setDefaultEncoding("UTF-8");
+        reloadableResourceBundleMessageSource.setDefaultLocale(Locale.forLanguageTag("en"));
     }
 
     @ParameterizedTest()
     @MethodSource("dataProvider_examples")
     void test_baseTranslationMessageSource(String code, String locale, Object expected) {
-        String message = messageSource.getMessage(
+        String message = catalogMessageSource.getMessage(
             code,
             null,
             Locale.forLanguageTag(locale)
@@ -102,6 +109,21 @@ class CatalogMessageSourceBehaviourTest {
         }
 
         String message = resourceBundleMessageSource.getMessage(
+            code,
+            null,
+            Locale.forLanguageTag(locale)
+        );
+        assertEquals(expected, message);
+    }
+
+    @ParameterizedTest()
+    @MethodSource("dataProvider_examples")
+    void test_reloadableResourceBundleMessageSource(String code, String locale, Object expected) {
+        if (!code.startsWith("messages.") && !code.startsWith("payment.")) {
+            code = "messages." + code;
+        }
+
+        String message = reloadableResourceBundleMessageSource.getMessage(
             code,
             null,
             Locale.forLanguageTag(locale)
@@ -171,9 +193,9 @@ class CatalogMessageSourceBehaviourTest {
         //    )
         //), null);
 
-        String properties = "";
+        StringBuilder properties = new StringBuilder();
         for (Entry<Object, Object> prop : entry.getValue().entrySet()) {
-            properties += prop.getKey() + "=" + prop.getValue() + "\n";
+            properties.append(prop.getKey()).append("=").append(prop.getValue()).append("\n");
         }
 
         FileOutputStream outputStream = new FileOutputStream(
@@ -182,8 +204,8 @@ class CatalogMessageSourceBehaviourTest {
                 !Objects.equals(entry.getKey(), defaultLocale.toString()) ? "_" + entry.getKey() : ""
             )
         );
-        byte[] strToBytes = properties.getBytes();
-        outputStream.write(strToBytes);
+        byte[] stream = properties.toString().getBytes();
+        outputStream.write(stream);
         outputStream.close();
     }
 }
