@@ -29,6 +29,10 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.context.support.ResourceBundleMessageSource;
 
+/**
+ * This test compares the logic when resolving the code of CatalogMessageSource vs. ResourceBundleMessageSource
+ * and ReloadableResourceBundleMessageSource. Behaviour must be equal.
+ */
 @SuppressWarnings({"java:S125"})
 class MessageSourceCompareBehaviourTest {
 
@@ -38,44 +42,11 @@ class MessageSourceCompareBehaviourTest {
 
     @BeforeAll
     static void beforeAll() throws IOException {
-
-        Map<String, Properties> messages = new HashMap<>();
         Locale defaultLocale = Locale.forLanguageTag("en");
-
-        List<TransUnit> transUnits = new ArrayList<>();
-        var resourcesLoader = new ResourcesLoader(
-            Locale.forLanguageTag("en"),
-            new HashSet<>(List.of("translations_example/*")),
-            List.of("json")
-        );
-
-        for (TranslationFile file : resourcesLoader.getTranslationFiles()) {
-            String json = new String(file.inputStream().readAllBytes(), StandardCharsets.UTF_8);
-            ObjectMapper mapper = new ObjectMapper();
-            Map<String, Object> items = mapper.convertValue(mapper.readTree(json), new TypeReference<>() {
-            });
-
-            for (Map.Entry<String, Object> item : items.entrySet()) {
-                messages.putIfAbsent(file.locale().toString(), new Properties());
-                messages.get(file.locale().toString()).put(
-                    file.domain() + "." + item.getKey(),
-                    item.getValue().toString()
-                );
-                transUnits.add(
-                    new TransUnit(
-                        file.locale(), item.getKey(), item.getValue().toString(), file.domain()
-                    )
-                );
-            }
-        }
-
-        for (Map.Entry<String, Properties> entry : messages.entrySet()) {
-            writePropertiesFiles(entry, defaultLocale);
-        }
 
         catalogMessageSource = new CatalogMessageSource(
             CatalogBuilder
-                .builder(transUnits, defaultLocale)
+                .builder(loadTransUnits(defaultLocale), defaultLocale)
                 .build()
         );
 
@@ -183,6 +154,43 @@ class MessageSourceCompareBehaviourTest {
             Arguments.of("payment.headline", "jp", "Payment (en)"),
             Arguments.of("payment.text", "jp", "Payment Text (en)")
         );
+    }
+
+    private static List<TransUnit> loadTransUnits(Locale defaultLocale) throws IOException {
+        Map<String, Properties> messages = new HashMap<>();
+
+        List<TransUnit> transUnits = new ArrayList<>();
+        var resourcesLoader = new ResourcesLoader(
+            Locale.forLanguageTag("en"),
+            new HashSet<>(List.of("translations_example/*")),
+            List.of("json")
+        );
+
+        for (TranslationFile file : resourcesLoader.getTranslationFiles()) {
+            String json = new String(file.inputStream().readAllBytes(), StandardCharsets.UTF_8);
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, Object> items = mapper.convertValue(mapper.readTree(json), new TypeReference<>() {
+            });
+
+            for (Map.Entry<String, Object> item : items.entrySet()) {
+                messages.putIfAbsent(file.locale().toString(), new Properties());
+                messages.get(file.locale().toString()).put(
+                    file.domain() + "." + item.getKey(),
+                    item.getValue().toString()
+                );
+                transUnits.add(
+                    new TransUnit(
+                        file.locale(), item.getKey(), item.getValue().toString(), file.domain()
+                    )
+                );
+            }
+        }
+
+        for (Map.Entry<String, Properties> entry : messages.entrySet()) {
+            writePropertiesFiles(entry, defaultLocale);
+        }
+
+        return transUnits;
     }
 
     private static void writePropertiesFiles(Entry<String, Properties> entry, Locale defaultLocale) throws IOException {
