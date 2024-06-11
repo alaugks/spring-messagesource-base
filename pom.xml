@@ -7,7 +7,7 @@
     <parent>
         <groupId>io.github.alaugks</groupId>
         <artifactId>spring-messagesource-parent</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0</version>
     </parent>
 
     <artifactId>spring-messagesource-catalog</artifactId>
@@ -37,16 +37,4 @@
         <developerConnection>scm:git:https://github.com/alaugks/spring-messagesource-catalog</developerConnection>
         <url>https://github.com/alaugks/spring-messagesource-catalog</url>
     </scm>
-
-    <repositories>
-        <repository>
-            <id>ossrh-release</id>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-        <repository>
-            <id>ossrh-snapshot</id>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-        </repository>
-    </repositories>
-
 </project>
