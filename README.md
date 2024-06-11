@@ -48,22 +48,22 @@ public class MessageConfig {
         var localeEn = Locale.forLanguageTag("en");
         transUnits.add(new TransUnit(localeEn, "headline", "Headline"));
         transUnits.add(new TransUnit(localeEn, "postcode", "Postcode"));
-        transUnits.add(new TransUnit(localeEn, "email-notice", "Your email {0} has been registered."));
+        transUnits.add(new TransUnit(localeEn, "validation.email.exists", "Your email {0} has been registered."));
         transUnits.add(new TransUnit(localeEn, "default-message", "This is a default message."));
         transUnits.add(new TransUnit(localeEn, "headline", "Payment", "payment"));
-        transUnits.add(new TransUnit(localeEn, "expiry_date", "Expiry date", "payment"));
+        transUnits.add(new TransUnit(localeEn, "form.expiry_date", "Expiry date", "payment"));
 
         var localeEnUs = Locale.forLanguageTag("en-US");
         transUnits.add(new TransUnit(localeEnUs, "postcode", "Zip code"));
-        transUnits.add(new TransUnit(localeEnUs, "expiry_date", "Expiration date", "payment"));
+        transUnits.add(new TransUnit(localeEnUs, "form.expiry_date", "Expiration date", "payment"));
 
         var localeDe = Locale.forLanguageTag("de");
         transUnits.add(new TransUnit(localeDe, "headline", "Überschrift"));
         transUnits.add(new TransUnit(localeDe, "postcode", "Postleitzahl"));
-        transUnits.add(new TransUnit(localeDe, "email-notice", "Ihre E-Mail {0} wurde registriert."));
+        transUnits.add(new TransUnit(localeDe, "validation.email.exists", "Ihre E-Mail {0} wurde registriert."));
         transUnits.add(new TransUnit(localeDe, "default-message", "Das ist ein Standardtext."));
         transUnits.add(new TransUnit(localeDe, "headline", "Zahlung", "payment"));
-        transUnits.add(new TransUnit(localeDe, "expiry_date", "Ablaufdatum", "payment"));
+        transUnits.add(new TransUnit(localeDe, "form.expiry_date", "Ablaufdatum", "payment"));
 
         return new CatalogMessageSource(
             CatalogBuilder
@@ -105,7 +105,7 @@ public class MessageConfig {
     <td>Postcode</td>
   </tr>
   <tr>
-    <td>email-notice*<br>messages.email-notice</td>
+    <td>validation.email.exists*<br>messages.validation.email.exists</td>
     <td>Your email {0} has been registered.</td>
     <td>Your email {0} has been registered.**</td>
     <td>Ihre E-Mail {0} wurde registriert.</td>
@@ -126,7 +126,7 @@ public class MessageConfig {
     <td>Payment</td>
   </tr>
   <tr>
-    <td>payment.expiry_date</td>
+    <td>payment.form.expiry_date</td>
     <td>Expiry date</td>
     <td>Expiration date</td>
     <td>Ablaufdatum</td>
@@ -163,8 +163,8 @@ With the configured MessageSource, the transUnits are available in Thymeleaf.
 <label th:text="#{messages.postcode}"/>
 
 <!-- "Your email john.doe@example.com has been registered." -->
-<span th:text="#{email-notice('john.doe@example.com')}"/>
-<span th:text="#{messages.email-notice('john.doe@example.com')}"/>
+<span th:text="#{validation.email.exists('john.doe@example.com')}"/>
+<span th:text="#{messages.validation.email.exists('john.doe@example.com')}"/>
 
 <!-- "This is a default message." -->
 <span th:text="${#messages.msgOrNull('not-exists-id')} ?: #{default-message}"/>
@@ -177,7 +177,7 @@ With the configured MessageSource, the transUnits are available in Thymeleaf.
 <h2 th:text="#{payment.headline}"/>
 
 <!-- "Expiry date" -->
-<strong th:text="#{payment.expiry_date}"/>
+<strong th:text="#{payment.form.expiry_date}"/>
 ```
 
 ### Service (Dependency Injection)
@@ -207,8 +207,8 @@ this.messageSource.getMessage("messages.postcode", null, locale);
 
 // "Your email john.doe@example.com has been registered."
 Object[] args = {"john.doe@example.com"};
-this.messageSource.getMessage("email-notice", args, locale);
-this.messageSource.getMessage("messages.email-notice", args, locale);
+this.messageSource.getMessage("validation.email.exists", args, locale);
+this.messageSource.getMessage("messages.validation.email.exists", args, locale);
 
 // "This is a default message."
 //String defaultMessage = this.messageSource.getMessage("default-message", null, locale);

@@ -30,22 +30,22 @@ class CatalogMessageSourceExampleTest {
         var localeEn = Locale.forLanguageTag("en");
         transUnits.add(new TransUnit(localeEn, "headline", "Headline"));
         transUnits.add(new TransUnit(localeEn, "postcode", "Postcode"));
-        transUnits.add(new TransUnit(localeEn, "email-notice", "Your email {0} has been registered."));
+        transUnits.add(new TransUnit(localeEn, "validation.email.exists", "Your email {0} has been registered."));
         transUnits.add(new TransUnit(localeEn, "default-message", "This is a default message."));
         transUnits.add(new TransUnit(localeEn, "headline", "Payment", "payment"));
-        transUnits.add(new TransUnit(localeEn, "expiry_date", "Expiry date", "payment"));
+        transUnits.add(new TransUnit(localeEn, "form.expiry_date", "Expiry date", "payment"));
 
         var localeEnUs = Locale.forLanguageTag("en-US");
         transUnits.add(new TransUnit(localeEnUs, "postcode", "Zip code"));
-        transUnits.add(new TransUnit(localeEnUs, "expiry_date", "Expiration date", "payment"));
+        transUnits.add(new TransUnit(localeEnUs, "form.expiry_date", "Expiration date", "payment"));
 
         var localeDe = Locale.forLanguageTag("de");
         transUnits.add(new TransUnit(localeDe, "headline", "Überschrift"));
         transUnits.add(new TransUnit(localeDe, "postcode", "Postleitzahl"));
-        transUnits.add(new TransUnit(localeDe, "email-notice", "Ihre E-Mail {0} wurde registriert."));
+        transUnits.add(new TransUnit(localeDe, "validation.email.exists", "Ihre E-Mail {0} wurde registriert."));
         transUnits.add(new TransUnit(localeDe, "default-message", "Das ist ein Standardtext."));
         transUnits.add(new TransUnit(localeDe, "headline", "Zahlung", "payment"));
-        transUnits.add(new TransUnit(localeDe, "expiry_date", "Ablaufdatum", "payment"));
+        transUnits.add(new TransUnit(localeDe, "form.expiry_date", "Ablaufdatum", "payment"));
 
         return new CatalogMessageSource(
             CatalogBuilder
@@ -73,53 +73,53 @@ class CatalogMessageSourceExampleTest {
             Arguments.of("messages.headline", "en", "Headline", null),
             Arguments.of("postcode", "en", "Postcode", null),
             Arguments.of("messages.postcode", "en", "Postcode", null),
-            Arguments.of("email-notice", "en", "Your email foo@example.com has been registered.",
+            Arguments.of("validation.email.exists", "en", "Your email foo@example.com has been registered.",
                 new Object[]{"foo@example.com"}),
-            Arguments.of("messages.email-notice", "en", "Your email foo@example.com has been registered.",
+            Arguments.of("messages.validation.email.exists", "en", "Your email foo@example.com has been registered.",
                 new Object[]{"foo@example.com"}),
             Arguments.of("default-message", "en", "This is a default message.", null),
             Arguments.of("messages.default-message", "en", "This is a default message.", null),
             Arguments.of("payment.headline", "en", "Payment", null),
-            Arguments.of("payment.expiry_date", "en", "Expiry date", null),
+            Arguments.of("payment.form.expiry_date", "en", "Expiry date", null),
 
             Arguments.of("headline", "en-US", "Headline", null),
             Arguments.of("messages.headline", "en-US", "Headline", null),
             Arguments.of("postcode", "en-US", "Zip code", null),
             Arguments.of("messages.postcode", "en-US", "Zip code", null),
-            Arguments.of("email-notice", "en-US", "Your email foo@example.com has been registered.",
+            Arguments.of("validation.email.exists", "en-US", "Your email foo@example.com has been registered.",
                 new Object[]{"foo@example.com"}),
-            Arguments.of("messages.email-notice", "en-US", "Your email foo@example.com has been registered.",
+            Arguments.of("messages.validation.email.exists", "en-US", "Your email foo@example.com has been registered.",
                 new Object[]{"foo@example.com"}),
             Arguments.of("default-message", "en-US", "This is a default message.", null),
             Arguments.of("messages.default-message", "en-US", "This is a default message.", null),
             Arguments.of("payment.headline", "en-US", "Payment", null),
-            Arguments.of("payment.expiry_date", "en-US", "Expiration date", null),
+            Arguments.of("payment.form.expiry_date", "en-US", "Expiration date", null),
 
             Arguments.of("headline", "de", "Überschrift", null),
             Arguments.of("messages.headline", "de", "Überschrift", null),
             Arguments.of("postcode", "de", "Postleitzahl", null),
             Arguments.of("messages.postcode", "de", "Postleitzahl", null),
-            Arguments.of("email-notice", "de", "Ihre E-Mail foo@example.com wurde registriert.",
+            Arguments.of("validation.email.exists", "de", "Ihre E-Mail foo@example.com wurde registriert.",
                 new Object[]{"foo@example.com"}),
-            Arguments.of("messages.email-notice", "de", "Ihre E-Mail foo@example.com wurde registriert.",
+            Arguments.of("messages.validation.email.exists", "de", "Ihre E-Mail foo@example.com wurde registriert.",
                 new Object[]{"foo@example.com"}),
             Arguments.of("default-message", "de", "Das ist ein Standardtext.", null),
             Arguments.of("messages.default-message", "de", "Das ist ein Standardtext.", null),
             Arguments.of("payment.headline", "de", "Zahlung", null),
-            Arguments.of("payment.expiry_date", "de", "Ablaufdatum", null),
+            Arguments.of("payment.form.expiry_date", "de", "Ablaufdatum", null),
 
             Arguments.of("headline", "jp", "Headline", null),
             Arguments.of("messages.headline", "jp", "Headline", null),
             Arguments.of("postcode", "jp", "Postcode", null),
             Arguments.of("messages.postcode", "jp", "Postcode", null),
-            Arguments.of("email-notice", "jp", "Your email foo@example.com has been registered.",
+            Arguments.of("validation.email.exists", "jp", "Your email foo@example.com has been registered.",
                 new Object[]{"foo@example.com"}),
-            Arguments.of("messages.email-notice", "jp", "Your email foo@example.com has been registered.",
+            Arguments.of("messages.validation.email.exists", "jp", "Your email foo@example.com has been registered.",
                 new Object[]{"foo@example.com"}),
             Arguments.of("default-message", "jp", "This is a default message.", null),
             Arguments.of("messages.default-message", "jp", "This is a default message.", null),
             Arguments.of("payment.headline", "jp", "Payment", null),
-            Arguments.of("payment.expiry_date", "jp", "Expiry date", null)
+            Arguments.of("payment.form.expiry_date", "jp", "Expiry date", null)
         );
     }
 }
