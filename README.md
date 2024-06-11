@@ -68,7 +68,6 @@ public class MessageConfig {
         return new CatalogMessageSource(
             CatalogBuilder
                 .builder(transUnits, Locale.forLanguageTag("en"))
-                .catalogCache(new CatalogCache(new ConcurrentMapCache("my-cache")))
                 //.defaultDomain(String defaultDomain)
                 .build()
         );

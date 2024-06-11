@@ -3,6 +3,7 @@ package io.github.alaugks.spring.messagesource.catalog.catalog;
 import io.github.alaugks.spring.messagesource.catalog.records.TransUnit;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import org.springframework.util.Assert;
 
 public class CatalogBuilder {
@@ -43,6 +44,10 @@ public class CatalogBuilder {
             catalogCache.build();
             return new CatalogBuilder(catalogCache);
         }
+    }
+
+    public Map<Locale, Map<String, String>> getAll() {
+        return this.catalog.getAll();
     }
 
     public String resolveCode(Locale locale, String code) {

@@ -7,7 +7,7 @@ public interface CatalogInterface {
 
     CatalogInterface nextHandler(CatalogInterface handler);
 
-    Map<String, Map<String, String>> getAll();
+    Map<Locale, Map<String, String>> getAll();
 
     String resolve(Locale locale, String code);
 

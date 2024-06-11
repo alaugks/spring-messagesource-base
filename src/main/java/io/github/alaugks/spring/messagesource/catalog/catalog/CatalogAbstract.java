@@ -14,7 +14,7 @@ abstract class CatalogAbstract implements CatalogInterface {
     }
 
     @Override
-    public Map<String, Map<String, String>> getAll() {
+    public Map<Locale, Map<String, String>> getAll() {
         if (this.nextHandler == null) {
             return new ConcurrentHashMap<>();
         }
@@ -36,18 +36,5 @@ abstract class CatalogAbstract implements CatalogInterface {
         if (this.nextHandler != null) {
             this.nextHandler.build();
         }
-    }
-
-    protected String localeToLocaleKey(Locale locale) {
-        Locale.Builder localeBuilder = new Locale.Builder();
-        localeBuilder.setLanguage(locale.getLanguage());
-        if (!locale.getCountry().isEmpty()) {
-            localeBuilder.setRegion(locale.getCountry());
-        }
-        return normalizeLocaleKey(localeBuilder.build().toString());
-    }
-
-    protected String normalizeLocaleKey(String langCode) {
-        return langCode.toLowerCase().replace("_", "-");
     }
 }
