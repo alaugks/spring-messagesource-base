@@ -18,10 +18,6 @@ public final class Catalog extends CatalogAbstract {
     private final String defaultDomain;
     private final List<TransUnit> transUnits;
 
-    public Catalog(List<TransUnit> transUnits, Locale defaultLocale) {
-        this(transUnits, defaultLocale, DEFAULT_DOMAIN);
-    }
-
     public Catalog(List<TransUnit> transUnits, Locale defaultLocale, String defaultDomain) {
         Assert.notNull(transUnits, "Argument transUnits must not be null");
         Assert.notNull(defaultLocale, "Argument defaultLocale must not be null");
@@ -133,7 +129,7 @@ public final class Catalog extends CatalogAbstract {
         return value;
     }
 
-    public String resolveCodeInCatalogMap(Locale locale, String code) {
+    private String resolveCodeInCatalogMap(Locale locale, String code) {
         String localeKey = super.localeToLocaleKey(locale);
         if (this.catalogMap.containsKey(localeKey)) {
             Map<String, String> languageCatalog = this.catalogMap.get(localeKey);

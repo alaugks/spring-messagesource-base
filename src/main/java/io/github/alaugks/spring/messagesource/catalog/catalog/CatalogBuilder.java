@@ -46,7 +46,7 @@ public class CatalogBuilder {
         public CatalogBuilder build() {
             CatalogInterface catalog = new Catalog(this.transUnits, this.defaultLocale, this.defaultDomain);
 
-            if (catalogCache != null) {
+            if (this.catalogCache != null) {
                 this.catalogCache.nextHandler(catalog);
                 this.catalogCache.build();
                 return new CatalogBuilder(this.catalogCache);

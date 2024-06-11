@@ -44,16 +44,17 @@ public final class CatalogCache extends CatalogAbstract {
             return null;
         }
 
-        String value = null;
+        String value;
+        // Resolve in Cache
         Cache.ValueWrapper valueWrapper = this.cache.get(this.createCacheKey(locale, code));
         if (valueWrapper != null) {
             value = Objects.requireNonNull(valueWrapper.get()).toString();
+            if (value != null) {
+                return value;
+            }
         }
 
-        if (value != null) {
-            return value;
-        }
-
+        // Resolve in Catalog
         value = super.resolve(locale, code);
         if (value != null) {
             this.put(locale, code, value);
