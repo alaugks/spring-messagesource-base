@@ -15,10 +15,10 @@ public class CatalogMessageSource extends AbstractMessageSource {
 
     @Override
     protected MessageFormat resolveCode(String code, Locale locale) {
-        try {
-            return new MessageFormat(this.catalogBuilder.resolveCode(locale, code), locale);
-        } catch (Exception e) {
-            return null;
+        String value = this.catalogBuilder.resolveCode(locale, code);
+        if (value != null) {
+            return new MessageFormat(value, locale);
         }
+        return null;
     }
 }
