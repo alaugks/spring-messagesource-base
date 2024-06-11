@@ -59,19 +59,21 @@ public final class Catalog extends CatalogAbstract {
     }
 
     private void put(Locale locale, String code, String value, String domain) {
-        if (domain == null) {
-            domain = DEFAULT_DOMAIN;
+        if (!locale.toString().isEmpty() && !code.isEmpty()) {
+            if (domain == null) {
+                domain = DEFAULT_DOMAIN;
+            }
+
+            this.catalogMap.putIfAbsent(
+                locale,
+                new HashMap<>()
+            );
+
+            this.catalogMap.get(locale).putIfAbsent(
+                concatCode(domain, code),
+                value
+            );
         }
-
-        this.catalogMap.putIfAbsent(
-            locale,
-            new HashMap<>()
-        );
-
-        this.catalogMap.get(locale).putIfAbsent(
-            concatCode(domain, code),
-            value
-        );
     }
 
     private String resolveCode(Locale locale, String code) {
