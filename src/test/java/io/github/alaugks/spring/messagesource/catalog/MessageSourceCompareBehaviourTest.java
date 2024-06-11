@@ -63,96 +63,96 @@ class MessageSourceCompareBehaviourTest {
 
     @ParameterizedTest()
     @MethodSource("dataProvider_examples")
-    void test_baseTranslationMessageSource(String code, String locale, Object expected) {
-        String message = catalogMessageSource.getMessage(
+    void test_baseTranslationMessageSource(String locale, String code, Object[] args, Object expected) {
+        assertEquals(expected, catalogMessageSource.getMessage(
             code,
-            null,
+            args,
             Locale.forLanguageTag(locale)
-        );
-        assertEquals(expected, message);
+        ));
     }
 
     @ParameterizedTest()
     @MethodSource("dataProvider_examples")
-    void test_resourceBundleMessageSource(String code, String locale, Object expected) {
+    void test_resourceBundleMessageSource(String locale, String code, Object[] args, Object expected) {
         if (!code.startsWith("messages.") && !code.startsWith("payment.")) {
             code = "messages." + code;
         }
 
-        String message = resourceBundleMessageSource.getMessage(
+        assertEquals(expected, resourceBundleMessageSource.getMessage(
             code,
-            null,
+            args,
             Locale.forLanguageTag(locale)
-        );
-        assertEquals(expected, message);
+        ));
     }
 
     @ParameterizedTest()
     @MethodSource("dataProvider_examples")
-    void test_reloadableResourceBundleMessageSource(String code, String locale, Object expected) {
+    void test_reloadableResourceBundleMessageSource(String locale, String code, Object[] args, Object expected) {
         if (!code.startsWith("messages.") && !code.startsWith("payment.")) {
             code = "messages." + code;
         }
 
-        String message = reloadableResourceBundleMessageSource.getMessage(
+        assertEquals(expected, reloadableResourceBundleMessageSource.getMessage(
             code,
-            null,
+            args,
             Locale.forLanguageTag(locale)
-        );
-        assertEquals(expected, message);
+        ));
     }
 
     private static Stream<Arguments> dataProvider_examples() {
         return Stream.of(
-            Arguments.of("headline", "en", "Headline (en)"),
-            Arguments.of("messages.headline", "en", "Headline (en)"),
-            Arguments.of("text", "en", "Text (en)"),
-            Arguments.of("messages.text", "en", "Text (en)"),
-            Arguments.of("notice", "en", "Notice (en)"),
-            Arguments.of("messages.notice", "en", "Notice (en)"),
-            Arguments.of("payment.headline", "en", "Payment (en)"),
-            Arguments.of("payment.text", "en", "Payment Text (en)"),
+            Arguments.of("en", "headline", null, "Headline (en)"),
+            Arguments.of("en", "messages.headline", null, "Headline (en)"),
+            Arguments.of("en", "text", null, "Text (en)"),
+            Arguments.of("en", "messages.text", null, "Text (en)"),
+            Arguments.of("en", "notice", null, "Notice (en)"),
+            Arguments.of("en", "messages.notice", null, "Notice (en)"),
+            Arguments.of("en", "payment.headline", null, "Payment (en)"),
+            Arguments.of("en", "payment.text", null, "Payment Text (en)"),
+            Arguments.of("en", "messageformat", new Object[] {10000}, "There are 10,000 files."),
 
-            Arguments.of("headline", "de", "Headline (de)"),
-            Arguments.of("messages.headline", "de", "Headline (de)"),
-            Arguments.of("text", "de", "Text (de)"),
-            Arguments.of("messages.text", "de", "Text (de)"),
-            Arguments.of("notice", "de", "Notice (en)"),
-            Arguments.of("messages.notice", "de", "Notice (en)"),
-            Arguments.of("payment.headline", "de", "Payment (de)"),
-            Arguments.of("payment.text", "de", "Payment Text (de)"),
+            Arguments.of("de", "headline", null, "Headline (de)"),
+            Arguments.of("de", "messages.headline", null, "Headline (de)"),
+            Arguments.of("de", "text", null, "Text (de)"),
+            Arguments.of("de", "messages.text", null, "Text (de)"),
+            Arguments.of("de", "notice", null, "Notice (en)"),
+            Arguments.of("de", "messages.notice", null, "Notice (en)"),
+            Arguments.of("de", "payment.headline", null, "Payment (de)"),
+            Arguments.of("de", "payment.text", null, "Payment Text (de)"),
+            Arguments.of("de", "messageformat", new Object[] {10000}, "Es gibt 10.000 Dateien."),
 
-            Arguments.of("headline", "en-US", "Headline (en)"),
-            Arguments.of("messages.headline", "en-US", "Headline (en)"),
-            Arguments.of("text", "en-US", "Text (en-US)"),
-            Arguments.of("messages.text", "en-US", "Text (en-US)"),
-            Arguments.of("notice", "en-US", "Notice (en)"),
-            Arguments.of("messages.notice", "en-US", "Notice (en)"),
-            Arguments.of("payment.headline", "en-US", "Payment (en-US)"),
-            Arguments.of("payment.text", "en-US", "Payment Text (en)"),
+            Arguments.of("en-US", "headline", null, "Headline (en)"),
+            Arguments.of("en-US", "messages.headline", null, "Headline (en)"),
+            Arguments.of("en-US", "text", null, "Text (en-US)"),
+            Arguments.of("en-US", "messages.text", null, "Text (en-US)"),
+            Arguments.of("en-US", "notice", null, "Notice (en)"),
+            Arguments.of("en-US", "messages.notice", null, "Notice (en)"),
+            Arguments.of("en-US", "payment.headline", null, "Payment (en-US)"),
+            Arguments.of("en-US", "payment.text", null, "Payment Text (en)"),
 
-            Arguments.of("headline", "es", "Headline (es)"),
-            Arguments.of("messages.headline", "es", "Headline (es)"),
-            Arguments.of("text", "es", "Text (es)"),
-            Arguments.of("messages.text", "es", "Text (es)"),
-            Arguments.of("notice", "es", "Notice (en)"),
-            Arguments.of("messages.notice", "es", "Notice (en)"),
-            Arguments.of("payment.headline", "es", "Payment (es)"),
-            Arguments.of("payment.text", "es", "Payment Text (es)"),
+            Arguments.of("es", "headline", null, "Headline (es)"),
+            Arguments.of("es", "messages.headline", null, "Headline (es)"),
+            Arguments.of("es", "text", null, "Text (es)"),
+            Arguments.of("es", "messages.text", null, "Text (es)"),
+            Arguments.of("es", "notice", null, "Notice (en)"),
+            Arguments.of("es", "messages.notice", null, "Notice (en)"),
+            Arguments.of("es", "payment.headline", null, "Payment (es)"),
+            Arguments.of("es", "payment.text", null, "Payment Text (es)"),
 
-            Arguments.of("headline", "es-CR", "Headline (es-CR)"),
-            Arguments.of("messages.headline", "es-CR", "Headline (es-CR)"),
-            Arguments.of("text", "es-CR", "Text (es)"),
-            Arguments.of("messages.text", "es-CR", "Text (es)"),
-            Arguments.of("notice", "es-CR", "Notice (en)"),
-            Arguments.of("messages.notice", "es-CR", "Notice (en)"),
-            Arguments.of("payment.headline", "es-CR", "Payment (es-CR)"),
-            Arguments.of("payment.text", "es-CR", "Payment Text (es)"),
+            Arguments.of("es-CR", "headline", null, "Headline (es-CR)"),
+            Arguments.of("es-CR", "messages.headline", null, "Headline (es-CR)"),
+            Arguments.of("es-CR", "text", null, "Text (es)"),
+            Arguments.of("es-CR", "messages.text", null, "Text (es)"),
+            Arguments.of("es-CR", "notice", null, "Notice (en)"),
+            Arguments.of("es-CR", "messages.notice", null, "Notice (en)"),
+            Arguments.of("es-CR", "payment.headline", null, "Payment (es-CR)"),
+            Arguments.of("es-CR", "payment.text", null, "Payment Text (es)"),
 
-            Arguments.of("headline", "jp", "Headline (en)"),
-            Arguments.of("messages.headline", "jp", "Headline (en)"),
-            Arguments.of("payment.headline", "jp", "Payment (en)"),
-            Arguments.of("payment.text", "jp", "Payment Text (en)")
+            Arguments.of("jp", "headline", null, "Headline (en)"),
+            Arguments.of("jp", "messages.headline", null, "Headline (en)"),
+            Arguments.of("jp", "payment.headline", null, "Payment (en)"),
+            Arguments.of("jp", "payment.text", null, "Payment Text (en)"),
+            Arguments.of("jp", "messageformat", new Object[] {10000}, "There are 10,000 files.")
         );
     }
 

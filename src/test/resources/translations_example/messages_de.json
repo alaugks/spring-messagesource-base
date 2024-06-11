@@ -1,4 +1,5 @@
 {
   "headline": "Headline (de)",
-  "text": "Text (de)"
+  "text": "Text (de)",
+  "messageformat": "Es gibt {0,choice,0#keine Datei|1#eine Datei|1<{0,number,integer} Dateien}."
 }
