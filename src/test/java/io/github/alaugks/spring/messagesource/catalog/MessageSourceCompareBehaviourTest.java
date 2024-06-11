@@ -109,7 +109,7 @@ class MessageSourceCompareBehaviourTest {
             Arguments.of("en", "messages.notice", null, "Notice (en)"),
             Arguments.of("en", "payment.headline", null, "Payment (en)"),
             Arguments.of("en", "payment.text", null, "Payment Text (en)"),
-            Arguments.of("en", "messageformat", new Object[] {10000}, "There are 10,000 files."),
+            Arguments.of("en", "messageformat", new Object[]{10000}, "There are 10,000 files."),
 
             Arguments.of("de", "headline", null, "Headline (de)"),
             Arguments.of("de", "messages.headline", null, "Headline (de)"),
@@ -119,7 +119,7 @@ class MessageSourceCompareBehaviourTest {
             Arguments.of("de", "messages.notice", null, "Notice (en)"),
             Arguments.of("de", "payment.headline", null, "Payment (de)"),
             Arguments.of("de", "payment.text", null, "Payment Text (de)"),
-            Arguments.of("de", "messageformat", new Object[] {10000}, "Es gibt 10.000 Dateien."),
+            Arguments.of("de", "messageformat", new Object[]{10000}, "Es gibt 10.000 Dateien."),
 
             Arguments.of("en-US", "headline", null, "Headline (en)"),
             Arguments.of("en-US", "messages.headline", null, "Headline (en)"),
@@ -152,7 +152,7 @@ class MessageSourceCompareBehaviourTest {
             Arguments.of("jp", "messages.headline", null, "Headline (en)"),
             Arguments.of("jp", "payment.headline", null, "Payment (en)"),
             Arguments.of("jp", "payment.text", null, "Payment Text (en)"),
-            Arguments.of("jp", "messageformat", new Object[] {10000}, "There are 10,000 files.")
+            Arguments.of("jp", "messageformat", new Object[]{10000}, "There are 10,000 files.")
         );
     }
 

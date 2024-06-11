@@ -35,48 +35,6 @@ class CatalogBuilderTest {
     }
 
     @Test
-    void test_withCache() {
-        String domain = "messages";
-        String key = domain + ".key";
-        String localeKey = "en|" + key;
-        List<TransUnit> transUnits = List.of(
-            new TransUnit(this.locale, "key", "from_base_catalog")
-        );
-
-        var cache = new ConcurrentMapCache("text-cache");
-        var cacheCatalog = new CatalogCache(cache);
-
-        // Is translation in cache?
-        var cacheBuffer = cacheToArray(cache);
-        assertNull(cacheBuffer.get(localeKey));
-
-        var messageSource = new CatalogMessageSource(
-            CatalogBuilder.builder(transUnits, this.locale).catalogCache(cacheCatalog).build()
-        );
-
-        // Exists item in Cache after build?
-        assertEquals("from_base_catalog", cacheToArray(cache).get(localeKey));
-
-        // Hit
-        assertEquals("from_base_catalog", messageSource.getMessage(key, null, this.locale));
-
-        // Remote item from Cache
-        cache.evictIfPresent(localeKey);
-
-        // Is item removed from cache?
-        assertNull(cacheToArray(cache).get(localeKey));
-
-        // Get from Catalog and put to Cache
-        assertEquals("from_base_catalog", messageSource.getMessage(key, null, this.locale));
-        assertEquals("from_base_catalog", cacheToArray(cache).get(localeKey));
-
-        // CatalogCache Hit
-        // Overwrite cacheItem to test translation is from Cache
-        cache.put(localeKey, "value_catalog_cache");
-        assertEquals("value_catalog_cache", messageSource.getMessage(key, null, this.locale));
-    }
-
-    @Test
     void test_withoutSetDefaultDomain() {
         List<TransUnit> transUnits = Arrays.asList(
             new TransUnit(this.locale, "key", "messages_value"),

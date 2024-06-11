@@ -1,19 +1,18 @@
 package io.github.alaugks.spring.messagesource.catalog.catalog;
 
 import io.github.alaugks.spring.messagesource.catalog.records.TransUnit;
-import io.github.alaugks.spring.messagesource.catalog.records.TransUnitCatalog;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Locale.Builder;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.util.Assert;
 
 public final class Catalog extends CatalogAbstract {
 
     public static final String DEFAULT_DOMAIN = "messages";
-    private final HashMap<String, Map<String, String>> catalogMap;
+    private final Map<String, Map<String, String>> catalogMap;
     private final Locale defaultLocale;
     private final String defaultDomain;
     private final List<TransUnit> transUnits;
@@ -23,28 +22,10 @@ public final class Catalog extends CatalogAbstract {
         Assert.notNull(defaultLocale, "Argument defaultLocale must not be null");
         Assert.notNull(defaultDomain, "Argument defaultDomain must not be null");
 
-        this.catalogMap = new HashMap<>();
+        this.catalogMap = new ConcurrentHashMap<>();
         this.transUnits = transUnits;
         this.defaultLocale = defaultLocale;
         this.defaultDomain = defaultDomain;
-    }
-
-    @Override
-    public List<TransUnitCatalog> getAll() {
-        if (!this.catalogMap.isEmpty()) {
-            List<TransUnitCatalog> transUnitCatalogs = new ArrayList<>();
-            this.catalogMap.forEach((localeCode, transUnit) -> transUnit.forEach((code, value) ->
-                transUnitCatalogs.add(
-                    new TransUnitCatalog(
-                        Locale.forLanguageTag(localeCode),
-                        code,
-                        value
-                    )
-                )
-            ));
-            return transUnitCatalogs;
-        }
-        return super.getAll();
     }
 
     @Override

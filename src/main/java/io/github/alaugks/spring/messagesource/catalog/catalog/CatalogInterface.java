@@ -1,14 +1,13 @@
 package io.github.alaugks.spring.messagesource.catalog.catalog;
 
-import io.github.alaugks.spring.messagesource.catalog.records.TransUnitCatalog;
-import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public interface CatalogInterface {
 
     CatalogInterface nextHandler(CatalogInterface handler);
 
-    List<TransUnitCatalog> getAll();
+    Map<String, Map<String, String>> getAll();
 
     String resolve(Locale locale, String code);
 

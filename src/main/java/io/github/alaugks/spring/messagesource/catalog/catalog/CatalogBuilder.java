@@ -21,7 +21,6 @@ public class CatalogBuilder {
 
         private final Locale defaultLocale;
         private final List<TransUnit> transUnits;
-        private CatalogInterface catalogCache;
         private String defaultDomain = Catalog.DEFAULT_DOMAIN;
 
         public Builder(List<TransUnit> transUnits, Locale defaultLocale) {
@@ -37,23 +36,12 @@ public class CatalogBuilder {
             return this;
         }
 
-        public Builder catalogCache(CatalogInterface catalogCache) {
-            Assert.notNull(catalogCache, "Argument catalogCache must not be null");
-            this.catalogCache = catalogCache;
-            return this;
-        }
-
         public CatalogBuilder build() {
-            CatalogInterface catalog = new Catalog(this.transUnits, this.defaultLocale, this.defaultDomain);
-
-            if (this.catalogCache != null) {
-                this.catalogCache.nextHandler(catalog);
-                this.catalogCache.build();
-                return new CatalogBuilder(this.catalogCache);
-            }
-
-            catalog.build();
-            return new CatalogBuilder(catalog);
+            CatalogInterface catalogCache = new CatalogCache().nextHandler(
+                new Catalog(this.transUnits, this.defaultLocale, this.defaultDomain)
+            );
+            catalogCache.build();
+            return new CatalogBuilder(catalogCache);
         }
     }
 

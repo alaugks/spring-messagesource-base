@@ -1,8 +1,8 @@
 package io.github.alaugks.spring.messagesource.catalog.catalog;
 
-import io.github.alaugks.spring.messagesource.catalog.records.TransUnitCatalog;
-import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 abstract class CatalogAbstract implements CatalogInterface {
 
@@ -14,9 +14,9 @@ abstract class CatalogAbstract implements CatalogInterface {
     }
 
     @Override
-    public List<TransUnitCatalog> getAll() {
+    public Map<String, Map<String, String>> getAll() {
         if (this.nextHandler == null) {
-            return List.of();
+            return new ConcurrentHashMap<>();
         }
 
         return this.nextHandler.getAll();

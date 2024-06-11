@@ -3,7 +3,6 @@ package io.github.alaugks.spring.messagesource.catalog;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.github.alaugks.spring.messagesource.catalog.catalog.CatalogBuilder;
-import io.github.alaugks.spring.messagesource.catalog.catalog.CatalogCache;
 import io.github.alaugks.spring.messagesource.catalog.records.TransUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +11,6 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.context.MessageSource;
 
 class CatalogMessageSourceExampleTest {
@@ -50,7 +48,6 @@ class CatalogMessageSourceExampleTest {
         return new CatalogMessageSource(
             CatalogBuilder
                 .builder(transUnits, Locale.forLanguageTag("en"))
-                .catalogCache(new CatalogCache(new ConcurrentMapCache("my-cache")))
                 .build()
         );
     }
