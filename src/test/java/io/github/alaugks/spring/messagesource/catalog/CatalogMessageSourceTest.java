@@ -3,12 +3,14 @@ package io.github.alaugks.spring.messagesource.catalog;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import io.github.alaugks.spring.messagesource.catalog.catalog.CatalogBuilder;
 import io.github.alaugks.spring.messagesource.catalog.records.TransUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ConcurrentHashMap;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -29,7 +31,8 @@ import org.springframework.context.support.DefaultMessageSourceResolvable;
 @TestMethodOrder(OrderAnnotation.class)
 class CatalogMessageSourceTest {
 
-    protected static MessageSource messageSource;
+    public static MessageSource messageSource;
+    public final Locale locale = Locale.forLanguageTag("en");
 
     @BeforeAll
     static void beforeAll() {
@@ -41,9 +44,9 @@ class CatalogMessageSourceTest {
         transUnits.add(new TransUnit(Locale.forLanguageTag("en"), "bar", "Placeholder", "foo"));
         transUnits.add(new TransUnit(Locale.forLanguageTag("de"), "bar", "Platzhalter", "foo"));
 
-        messageSource = new CatalogMessageSource(
-            CatalogBuilder.builder(transUnits, Locale.forLanguageTag("en")).build()
-        );
+        messageSource = CatalogMessageSource
+            .builder(transUnits, Locale.forLanguageTag("en"))
+            .build();
     }
 
     @Test
@@ -254,7 +257,6 @@ class CatalogMessageSourceTest {
     @Test
     @Order(399)
     void test_getMessage_Resolvable_NoSuchMessageException() {
-        Locale locale = Locale.forLanguageTag("en");
         String[] codes = {"not_exists"};
         DefaultMessageSourceResolvable resolvable = new DefaultMessageSourceResolvable(
             codes
@@ -262,7 +264,7 @@ class CatalogMessageSourceTest {
 
         assertThrows(NoSuchMessageException.class, () -> messageSource.getMessage(
             resolvable,
-            locale
+            this.locale
         ));
     }
 
@@ -300,10 +302,9 @@ class CatalogMessageSourceTest {
             )
         );
 
-        var messageSourceChoice = new CatalogMessageSource(
-            CatalogBuilder.builder(transUnits, Locale.forLanguageTag("en"))
-                .build()
-        );
+        var messageSourceChoice = CatalogMessageSource
+            .builder(transUnits, Locale.forLanguageTag("en"))
+            .build();
 
         assertEquals("There are 10,000 files.", messageSourceChoice.getMessage(
             "format_choice",
@@ -326,6 +327,63 @@ class CatalogMessageSourceTest {
             new Object[]{1},
             Locale.forLanguageTag("de")
         ));
+    }
+
+    @Test
+    void test_putCache() {
+        List<TransUnit> transUnits = List.of(
+            new TransUnit(this.locale, "key", "messages_value")
+        );
+
+        var messageSourcePutCache = CatalogMessageSource.builder(transUnits, this.locale).build();
+
+        try {
+            messageSourcePutCache.getMessage("messages.key", null, this.locale);
+            messageSourcePutCache.getMessage("key", null, this.locale);
+            messageSourcePutCache.getMessage("not-exists", null, this.locale);
+        } catch (NoSuchMessageException e) {
+            //
+        }
+
+        messageSourcePutCache.getAll();
+        assertEquals("messages_value", messageSourcePutCache.getAll().get(locale).get("key"));
+        assertTrue(messageSourcePutCache.getAll().get(locale).containsKey("not-exists"));
+        assertNull(messageSourcePutCache.getAll().get(locale).get("not-exists"));
+    }
+
+    @Test
+    void test_getAll_emptyCatalog() {
+        assertEquals(
+            new ConcurrentHashMap<>(),
+            CatalogMessageSource.builder(List.of(), this.locale).build().getAll()
+        );
+    }
+
+    @Test
+    void test_withoutSetDefaultDomain() {
+        List<TransUnit> transUnits = Arrays.asList(
+            new TransUnit(this.locale, "key", "messages_value"),
+            new TransUnit(this.locale, "key", "foo_value", "foo")
+        );
+
+        assertEquals(
+            "messages_value",
+            CatalogMessageSource.builder(transUnits, this.locale).build().getMessage("key", null, this.locale)
+        );
+    }
+
+    @Test
+    void test_withSetDefaultDomain() {
+        List<TransUnit> transUnits = Arrays.asList(
+            new TransUnit(this.locale, "key", "messages_value"),
+            new TransUnit(this.locale, "key", "foo_value", "foo")
+        );
+
+        assertEquals(
+            "foo_value",
+            CatalogMessageSource
+                .builder(transUnits, this.locale).defaultDomain("foo").build().getMessage("key", null, this.locale)
+        );
     }
 
 }

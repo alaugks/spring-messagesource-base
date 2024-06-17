@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.alaugks.spring.messagesource.catalog.catalog.CatalogBuilder;
 import io.github.alaugks.spring.messagesource.catalog.records.TransUnit;
 import io.github.alaugks.spring.messagesource.catalog.records.TranslationFile;
 import io.github.alaugks.spring.messagesource.catalog.ressources.ResourcesLoader;
@@ -44,11 +43,9 @@ class MessageSourceCompareBehaviourTest {
     static void beforeAll() throws IOException {
         Locale defaultLocale = Locale.forLanguageTag("en");
 
-        catalogMessageSource = new CatalogMessageSource(
-            CatalogBuilder
-                .builder(loadTransUnits(defaultLocale), defaultLocale)
-                .build()
-        );
+        catalogMessageSource = CatalogMessageSource
+            .builder(loadTransUnits(defaultLocale), defaultLocale)
+            .build();
 
         resourceBundleMessageSource = new ResourceBundleMessageSource();
         resourceBundleMessageSource.setBasename("messages/messages");

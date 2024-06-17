@@ -2,7 +2,6 @@ package io.github.alaugks.spring.messagesource.catalog;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import io.github.alaugks.spring.messagesource.catalog.catalog.CatalogBuilder;
 import io.github.alaugks.spring.messagesource.catalog.records.TransUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,37 +20,35 @@ class CatalogMessageSourceExampleTest {
         this.messageSource = this.messageSource();
     }
 
+    List<TransUnit> transUnits = new ArrayList<>() {{
+        // en
+        add(new TransUnit(Locale.forLanguageTag("en"), "headline", "Headline"));
+        add(new TransUnit(Locale.forLanguageTag("en"), "postcode", "Postcode"));
+        add(new TransUnit(Locale.forLanguageTag("en"), "validation.email.exists",
+            "Your email {0} has been registered."));
+        add(new TransUnit(Locale.forLanguageTag("en"), "default-message", "This is a default message."));
+        add(new TransUnit(Locale.forLanguageTag("en"), "headline", "Payment", "payment"));
+        add(new TransUnit(Locale.forLanguageTag("en"), "form.expiry_date", "Expiry date", "payment"));
+
+        // en-US
+        add(new TransUnit(Locale.forLanguageTag("en-US"), "postcode", "Zip code"));
+        add(new TransUnit(Locale.forLanguageTag("en-US"), "form.expiry_date", "Expiration date", "payment"));
+
+        // de
+        add(new TransUnit(Locale.forLanguageTag("de"), "headline", "Überschrift"));
+        add(new TransUnit(Locale.forLanguageTag("de"), "postcode", "Postleitzahl"));
+        add(new TransUnit(Locale.forLanguageTag("de"), "validation.email.exists",
+            "Ihre E-Mail {0} wurde registriert."));
+        add(new TransUnit(Locale.forLanguageTag("de"), "default-message", "Das ist ein Standardtext."));
+        add(new TransUnit(Locale.forLanguageTag("de"), "headline", "Zahlung", "payment"));
+        add(new TransUnit(Locale.forLanguageTag("de"), "form.expiry_date", "Ablaufdatum", "payment"));
+    }};
+
     public MessageSource messageSource() {
-
-        List<TransUnit> transUnits = new ArrayList<>();
-
-        var localeEn = Locale.forLanguageTag("en");
-        transUnits.add(new TransUnit(localeEn, "headline", "Headline"));
-        transUnits.add(new TransUnit(localeEn, "postcode", "Postcode"));
-        transUnits.add(new TransUnit(localeEn, "validation.email.exists", "Your email {0} has been registered."));
-        transUnits.add(new TransUnit(localeEn, "default-message", "This is a default message."));
-        transUnits.add(new TransUnit(localeEn, "headline", "Payment", "payment"));
-        transUnits.add(new TransUnit(localeEn, "form.expiry_date", "Expiry date", "payment"));
-
-        var localeEnUs = Locale.forLanguageTag("en-US");
-        transUnits.add(new TransUnit(localeEnUs, "postcode", "Zip code"));
-        transUnits.add(new TransUnit(localeEnUs, "form.expiry_date", "Expiration date", "payment"));
-
-        var localeDe = Locale.forLanguageTag("de");
-        transUnits.add(new TransUnit(localeDe, "headline", "Überschrift"));
-        transUnits.add(new TransUnit(localeDe, "postcode", "Postleitzahl"));
-        transUnits.add(new TransUnit(localeDe, "validation.email.exists", "Ihre E-Mail {0} wurde registriert."));
-        transUnits.add(new TransUnit(localeDe, "default-message", "Das ist ein Standardtext."));
-        transUnits.add(new TransUnit(localeDe, "headline", "Zahlung", "payment"));
-        transUnits.add(new TransUnit(localeDe, "form.expiry_date", "Ablaufdatum", "payment"));
-
-        return new CatalogMessageSource(
-            CatalogBuilder
-                .builder(transUnits, Locale.forLanguageTag("en"))
-                .build()
-        );
+        return CatalogMessageSource
+            .builder(this.transUnits, Locale.forLanguageTag("en"))
+            .build();
     }
-
 
     @ParameterizedTest()
     @MethodSource("dataProvider_examples")
