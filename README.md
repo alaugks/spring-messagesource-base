@@ -29,35 +29,12 @@ implementation group: 'io.github.alaugks', name: 'spring-messagesource-catalog',
 
 ### Options
 
-<table>
-<thead>
-    <tr>
-        <th>Options</th>
-        <th>Description</th>
-    </tr>
-</thead>
-<tbody>
-    <tr>
-        <td>
-            builder(List&lt;TransUnit&gt; transUnits, Locale defaultLocale)
-        </td>
-        <td>
-            Required: Yes<br>
-            List&lt;TransUnit&gt; transUnits: List of messages (translations)<br>
-            Locale defaultLocale: Default Locale
-        </td> 
-    <tr>
-        <td>
-            defaultDomain(String defaultDomain)
-        </td>
-        <td>
-            Required: No<br>
-            If the String domain argument is not set, the default is the **messages** domain.
-        </td>
-    </tr>
-</tbody>
-</table>
+`builder(List<TransUnit> transUnits, Locale defaultLocale)` (required)
+* Argument `List<TransUnit> transUnits`: List of messages (translations)<br>
+* Argument `Locale defaultLocale`: Default Locale
 
+`defaultDomain(String defaultDomain)`
+* If the String domain argument is not set, the default is the **messages** domain.
 
 ### TransUnit Record
 
@@ -113,6 +90,7 @@ public class MessageConfig {
     public MessageSource messageSource() {
         return CatalogMessageSource
             .builder(this.transUnits, Locale.forLanguageTag("en"))
+            //.defaultDomain("mydefaultdomain")
             .build();
     }
 }
