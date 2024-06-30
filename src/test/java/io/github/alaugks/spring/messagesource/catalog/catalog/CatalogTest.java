@@ -19,59 +19,61 @@ class CatalogTest {
 
         List<TransUnit> transUnits = new ArrayList<>();
 
-        // Domain foo
-        transUnits.add(new TransUnit(Locale.forLanguageTag("en"), "key_1", "value_en_1", "foo"));
-        transUnits.add(new TransUnit(Locale.forLanguageTag("en"), "key_2", "value_en_2", "foo"));
-        transUnits.add(new TransUnit(Locale.forLanguageTag("en"), "key_1", "value_en_3", "foo")); // Check overwrite
-        // Domain bar
-        transUnits.add(new TransUnit(Locale.forLanguageTag("en"), "key_1", "value_en_1", "bar"));
-        transUnits.add(new TransUnit(Locale.forLanguageTag("en"), "key_2", "value_en_2", "bar"));
-        transUnits.add(new TransUnit(Locale.forLanguageTag("en"), "key_1", "value_en_3", "bar")); // Check overwrite
-        // Domain foo
-        transUnits.add(new TransUnit(Locale.forLanguageTag("en-US"), "key_1", "value_en_us_1", "foo"));
-        transUnits.add(new TransUnit(Locale.forLanguageTag("en_US"), "key_2", "value_en_us_2", "foo"));
+        // Domain messages
+        transUnits.add(new TransUnit(Locale.forLanguageTag("en"), "key_1", "value_en_1"));
+        transUnits.add(new TransUnit(Locale.forLanguageTag("en"), "key_2", "value_en_2"));
+        transUnits.add(new TransUnit(Locale.forLanguageTag("en"), "key_1", "value_en_3")); // Check overwrite
 
-        catalog = new Catalog(transUnits, Locale.forLanguageTag("en"), "foo");
+        // Domain foobar
+        transUnits.add(new TransUnit(Locale.forLanguageTag("en"), "key_1", "value_en_1", "foobar"));
+        transUnits.add(new TransUnit(Locale.forLanguageTag("en"), "key_2", "value_en_2", "foobar"));
+        transUnits.add(new TransUnit(Locale.forLanguageTag("en"), "key_1", "value_en_3", "foobar")); // Check overwrite
+
+        // Domain messages
+        transUnits.add(new TransUnit(Locale.forLanguageTag("en-US"), "key_1", "value_en_us_1", "messages"));
+        transUnits.add(new TransUnit(Locale.forLanguageTag("en_US"), "key_2", "value_en_us_2", "messages"));
+
+        catalog = new Catalog(transUnits, Locale.forLanguageTag("en"));
         catalog.build();
     }
 
     @Test
     void test_fallback() {
-        // Domain foo
+        // Domain messages
         Locale locale = Locale.forLanguageTag("en");
-        assertEquals("value_en_1", catalog.resolve(locale, "foo.key_1"));
-        assertEquals("value_en_1", catalog.resolve(locale, "key_1"));
+        assertEquals("value_en_1", catalog.resolveCode(locale, "messages.key_1"));
+        assertEquals("value_en_1", catalog.resolveCode(locale, "key_1"));
     }
 
     @Test
     void test_en() {
-        // Domain foo
+        // Domain messages
         Locale locale = Locale.forLanguageTag("en");
-        assertEquals("value_en_1", catalog.resolve(locale, "foo.key_1"));
-        // Domain bar
-        assertEquals("value_en_1", catalog.resolve(locale, "bar.key_1"));
-        // Domain foo
-        assertEquals("value_en_2", catalog.resolve(locale, "foo.key_2"));
-        // Domain bar
-        assertEquals("value_en_2", catalog.resolve(locale, "bar.key_2"));
+        assertEquals("value_en_1", catalog.resolveCode(locale, "messages.key_1"));
+        // Domain foobar
+        assertEquals("value_en_1", catalog.resolveCode(locale, "foobar.key_1"));
+        // Domain messages
+        assertEquals("value_en_2", catalog.resolveCode(locale, "messages.key_2"));
+        // Domain foobar
+        assertEquals("value_en_2", catalog.resolveCode(locale, "foobar.key_2"));
 
-        // Domain bar
-        assertNull(catalog.resolve(locale, "bar.key_3"));
-        // Domain foo
-        assertNull(catalog.resolve(locale, "foo.key_3"));
+        // Domain foobar
+        assertNull(catalog.resolveCode(locale, "foobar.key_3"));
+        // Domain messages
+        assertNull(catalog.resolveCode(locale, "messages.key_3"));
     }
 
     @Test
-    void test_enUk_withDash() {
+    void test_enUk_withRegion() {
         Locale locale = Locale.forLanguageTag("en-US");
-        // Domain foo
-        assertEquals("value_en_us_1", catalog.resolve(locale, "foo.key_1"));
+        // Domain messages
+        assertEquals("value_en_us_1", catalog.resolveCode(locale, "messages.key_1"));
     }
 
     @Test
     void test_get_paramValuesEmpty() {
-        assertNull(catalog.resolve(Locale.forLanguageTag("en"), ""));
-        assertNull(catalog.resolve(Locale.forLanguageTag(""), "messages.m_en_1"));
+        assertNull(catalog.resolveCode(Locale.forLanguageTag("en"), ""));
+        assertNull(catalog.resolveCode(Locale.forLanguageTag(""), "messages.m_en_1"));
     }
 
 }

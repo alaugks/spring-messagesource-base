@@ -9,7 +9,7 @@ public interface CatalogInterface {
 
     Map<Locale, Map<String, String>> getAll();
 
-    String resolve(Locale locale, String code);
+    String resolveCode(Locale locale, String code);
 
     void build();
 }

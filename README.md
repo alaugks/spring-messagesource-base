@@ -14,7 +14,7 @@
     <dependency>
         <groupId>io.github.alaugks</groupId>
         <artifactId>spring-messagesource-catalog</artifactId>
-        <version>0.0.10-SNAPSHOT</version>
+        <version>0.0.11-SNAPSHOT</version>
     </dependency>
 </dependencies>
 ```
@@ -22,7 +22,7 @@
 ### Gradle
 
 ```
-implementation group: 'io.github.alaugks', name: 'spring-messagesource-catalog', version: '0.0.10-SNAPSHOT'
+implementation group: 'io.github.alaugks', name: 'spring-messagesource-catalog', version: '0.0.11-SNAPSHOT'
 ```
 
 ## CatalogMessageSource Configuration

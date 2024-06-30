@@ -23,12 +23,12 @@ abstract class CatalogAbstract implements CatalogInterface {
     }
 
     @Override
-    public String resolve(Locale locale, String code) {
+    public String resolveCode(Locale locale, String code) {
         if (this.nextHandler == null) {
             return null;
         }
 
-        return this.nextHandler.resolve(locale, code);
+        return this.nextHandler.resolveCode(locale, code);
     }
 
     @Override

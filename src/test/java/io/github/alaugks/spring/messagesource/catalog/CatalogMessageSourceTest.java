@@ -1,6 +1,7 @@
 package io.github.alaugks.spring.messagesource.catalog;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -344,8 +345,7 @@ class CatalogMessageSourceTest {
         } catch (NoSuchMessageException e) {
             //
         }
-
-        messageSourcePutCache.getAll();
+        
         assertEquals("messages_value", messageSourcePutCache.getAll().get(locale).get("key"));
         assertTrue(messageSourcePutCache.getAll().get(locale).containsKey("not-exists"));
         assertNull(messageSourcePutCache.getAll().get(locale).get("not-exists"));

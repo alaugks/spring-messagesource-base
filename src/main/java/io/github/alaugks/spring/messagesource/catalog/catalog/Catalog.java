@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Locale.Builder;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.util.Assert;
 
@@ -16,6 +17,10 @@ public final class Catalog extends CatalogAbstract {
     private final Locale defaultLocale;
     private final String defaultDomain;
     private final List<TransUnit> transUnits;
+
+    public Catalog(List<TransUnit> transUnits, Locale defaultLocale) {
+        this(transUnits, defaultLocale, DEFAULT_DOMAIN);
+    }
 
     public Catalog(List<TransUnit> transUnits, Locale defaultLocale, String defaultDomain) {
         Assert.notNull(transUnits, "Argument transUnits must not be null");
@@ -29,27 +34,17 @@ public final class Catalog extends CatalogAbstract {
     }
 
     @Override
-    public String resolve(Locale locale, String code) {
-
+    public String resolveCode(Locale locale, String code) {
         if (locale.toString().isEmpty() || code.isEmpty()) {
-            return null;
+            return super.resolveCode(locale, code);
         }
 
-        String value = this.resolveCode(locale, code);
-        if (value != null) {
-            return value;
-        }
-
-        return super.resolve(locale, code);
+        return this.resolveFromCatalogMap(locale, code).orElse(null);
     }
 
     @Override
     public Map<Locale, Map<String, String>> getAll() {
-        if (!this.catalogMap.isEmpty()) {
-            return this.catalogMap;
-        }
-
-        return super.getAll();
+        return this.catalogMap.isEmpty() ? super.getAll() : this.catalogMap;
     }
 
     @Override
@@ -59,82 +54,33 @@ public final class Catalog extends CatalogAbstract {
     }
 
     private void put(Locale locale, String code, String value, String domain) {
-        if (!locale.toString().isEmpty() && !code.isEmpty()) {
-            if (domain == null) {
-                domain = DEFAULT_DOMAIN;
-            }
-
-            this.catalogMap.putIfAbsent(
-                locale,
-                new HashMap<>()
-            );
-
-            this.catalogMap.get(locale).putIfAbsent(
-                concatCode(domain, code),
-                value
-            );
+        if (locale.toString().isEmpty() || code.isEmpty()) {
+            return;
         }
+        this.catalogMap.putIfAbsent(locale, new HashMap<>());
+        this.catalogMap.get(locale).putIfAbsent(concatCode(domain, code), value);
     }
 
-    private String resolveCode(Locale locale, String code) {
-        String value;
-
-        // locale and code
-        value = this.resolveCodeInCatalogMap(locale, code);
-        if (value != null) {
-            return value;
-        }
-
-        // locale AND domain.code
-        value = this.resolveCodeInCatalogMap(locale, concatCode(this.defaultDomain, code));
-        if (value != null) {
-            return value;
-        }
-
-        // locale(without region) code
-        value = this.resolveCodeInCatalogMap(buildLocaleWithoutRegion(locale), code);
-        if (value != null) {
-            return value;
-        }
-
-        // locale(without region) domain.code
-        value = this.resolveCodeInCatalogMap(buildLocaleWithoutRegion(locale), concatCode(this.defaultDomain, code));
-        if (value != null) {
-            return value;
-        }
-
-        // default locale AND code
-        value = this.resolveCodeInCatalogMap(this.defaultLocale, code);
-        if (value != null) {
-            return value;
-        }
-
-        // default locale AND domain.code
-        value = this.resolveCodeInCatalogMap(this.defaultLocale, concatCode(this.defaultDomain, code));
-        if (value != null) {
-            return value;
-        }
-
-        return value;
+    private Optional<String> resolveFromCatalogMap(Locale locale, String code) {
+        return this.getTargetValue(locale, code)
+            .or(() -> this.getTargetValue(locale, concatCode(this.defaultDomain, code)))
+            .or(() -> this.getTargetValue(buildLocaleWithoutRegion(locale), code))
+            .or(() -> this.getTargetValue(buildLocaleWithoutRegion(locale), concatCode(this.defaultDomain, code)))
+            .or(() -> this.getTargetValue(this.defaultLocale, code))
+            .or(() -> this.getTargetValue(this.defaultLocale, concatCode(this.defaultDomain, code)));
     }
 
-    private String resolveCodeInCatalogMap(Locale locale, String code) {
-        if (this.catalogMap.containsKey(locale)) {
-            Map<String, String> languageCatalog = this.catalogMap.get(locale);
-            if (languageCatalog.containsKey(code)) {
-                return languageCatalog.get(code);
-            }
-        }
-        return null;
+    private Optional<String> getTargetValue(Locale locale, String code) {
+        return Optional.ofNullable(this.catalogMap.get(locale)).flatMap(
+            languageCatalog -> Optional.ofNullable(languageCatalog.get(code))
+        );
     }
 
     private static String concatCode(String domain, String code) {
-        return domain + "." + code;
+        return Optional.ofNullable(domain).orElse(DEFAULT_DOMAIN) + "." + code;
     }
 
     private static Locale buildLocaleWithoutRegion(Locale locale) {
-        Builder localeBuilder = new Builder();
-        localeBuilder.setLanguage(locale.getLanguage());
-        return localeBuilder.build();
+        return new Builder().setLanguage(locale.getLanguage()).build();
     }
 }
