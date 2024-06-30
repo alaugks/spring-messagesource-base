@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
 
-public class CatalogCacheTest {
+class CatalogCacheTest {
 
     @Test
     void test_get_paramValuesEmpty() {
