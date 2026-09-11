@@ -1,0 +1,21 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2024 André Laugks <alaugks@gmail.com>
+
+package io.github.alaugks.spring.messagesource.base.exception;
+
+/**
+ * Unchecked wrapper for failures inside the base pipeline (resource loading, locale
+ * parsing, etc.). Thrown so callers do not need to handle checked exceptions from internal
+ * I/O or parsing operations.
+ */
+public class BaseMessageSourceRuntimeException extends RuntimeException {
+
+	/**
+	 * Wraps the given throwable as an unchecked base exception.
+	 *
+	 * @param cause the underlying checked exception being wrapped
+	 */
+	public BaseMessageSourceRuntimeException(Throwable cause) {
+		super(cause);
+	}
+}

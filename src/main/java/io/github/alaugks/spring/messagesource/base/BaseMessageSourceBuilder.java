@@ -1,0 +1,352 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2024 André Laugks <alaugks@gmail.com>
+
+package io.github.alaugks.spring.messagesource.base;
+
+import io.github.alaugks.spring.messagesource.base.records.TransUnitInterface;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.ResourceBundle;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import org.jspecify.annotations.Nullable;
+import org.springframework.context.MessageSource;
+import org.springframework.context.MessageSourceResolvable;
+import org.springframework.context.NoSuchMessageException;
+import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
+
+/**
+ * <p>Trans units are aggregated into an in-memory base during construction. Codes are
+ * resolved from that base first, with locale fallback delegated to the JDK via
+ * {@link ResourceBundle}; on a miss, the optional parent {@link MessageSource} is consulted.
+ *
+ * <p>Use {@link #builder(Locale, List)} to obtain a {@link Builder} and configure ICU4J
+ * formatting or a parent message source before calling {@link Builder#build()}.
+ */
+public class BaseMessageSourceBuilder implements MessageSource {
+
+	/** Internal base name for the ResourceBundle that serves the base. */
+	private static final String BUNDLE_BASE_NAME = BaseMessageSourceBuilder.class.getPackageName();
+
+	/** Internal bundle format name handled by BaseControl. */
+	private static final String BUNDLE_FORMAT = "base";
+
+	/** Loads and merges the locale's base buckets into a bundle. */
+	private final ResourceBundle.Control control = new BaseControl();
+
+	/** Per-instance cache of resolved bundles, keyed by locale. */
+	private final ConcurrentMap<Locale, ResourceBundle> bundles = new ConcurrentHashMap<>();
+
+	/** In-memory base of trans units, keyed by locale and then by code. */
+	private final ConcurrentMap<Locale, ConcurrentMap<String, String>> transUnits;
+
+	/** Locale used as fallback when a code cannot be resolved for the requested locale. */
+	private final Locale defaultLocale;
+
+	/** Whether messages are formatted with ICU4J. */
+	private final boolean useICU4j;
+
+	/** Optional parent consulted when a code cannot be resolved locally. */
+	private final @Nullable MessageSource parentMessageSource;
+
+	/**
+	 * A {@link MessageFormatter} implementation that uses the ICU4J library for message formatting.
+	 * This formatter supports both positional and named argument formatting.
+	 */
+	private final MessageFormatter icu = (value, locale, args) -> {
+		com.ibm.icu.text.MessageFormat messageFormat = new com.ibm.icu.text.MessageFormat(value, locale);
+
+		if (args.length == 1 && args[0] instanceof java.util.Map<?, ?> map) {
+			@SuppressWarnings("unchecked")
+			java.util.Map<String, Object> namedArgs = (java.util.Map<String, Object>) map;
+			return messageFormat.format(namedArgs);
+		}
+
+		return messageFormat.format(args);
+	};
+
+	/**
+	 * Message formatter implementation that uses the JDK's {@link java.text.MessageFormat}.
+	 */
+	private final MessageFormatter jdk = (value, locale, args) ->
+		new java.text.MessageFormat(value, locale).format(args);
+
+	/**
+	 * Aggregates trans units into the base map and composes the sources for
+	 * late-binding fallback.
+	 */
+	private BaseMessageSourceBuilder(
+		Locale defaultLocale,
+		List<TransUnitInterface> transUnits,
+		boolean useICU4j,
+		@Nullable MessageSource parentMessageSource
+	) {
+		this.defaultLocale = defaultLocale;
+		this.useICU4j = useICU4j;
+		this.parentMessageSource = parentMessageSource;
+		this.transUnits = new ConcurrentHashMap<>();
+
+		transUnits.forEach(t -> this.put(t.locale(), t.code(), t.value()));
+	}
+
+	/**
+	 * Creates a new {@link Builder} seeded with the given trans units.
+	 *
+	 * @param defaultLocale the locale used as a fallback when a code cannot be resolved for the requested locale; must
+	 *                      not be {@code null}
+	 * @param transUnits    the trans units to aggregate into the base; must not be {@code null}
+	 * @return a new {@link Builder} instance
+	 */
+	public static Builder builder(Locale defaultLocale, List<TransUnitInterface> transUnits) {
+		return new Builder(defaultLocale, transUnits);
+	}
+
+	@Override
+	public final @Nullable String getMessage(String code, Object @Nullable [] args, @Nullable String defaultMessage,
+		@Nullable Locale locale) {
+		String msg = this.getMessageInternal(code, args, locale);
+		if (msg != null) {
+			return msg;
+		}
+
+		return defaultMessage;
+	}
+
+	@Override
+	public final String getMessage(String code, Object @Nullable [] args, @Nullable Locale locale)
+		throws NoSuchMessageException {
+		String msg = this.getMessageInternal(code, args, locale);
+		if (msg != null) {
+			return msg;
+		}
+
+		throw new NoSuchMessageException(code, Objects.requireNonNullElse(locale, this.defaultLocale));
+	}
+
+	@Override
+	public final String getMessage(MessageSourceResolvable resolvable, @Nullable Locale locale)
+		throws NoSuchMessageException {
+		String[] codes = resolvable.getCodes();
+		if (codes != null) {
+			for (String code : codes) {
+				String message = this.getMessageInternal(code, resolvable.getArguments(), locale);
+				if (message != null) {
+					return message;
+				}
+			}
+		}
+
+		String defaultMessage = resolvable.getDefaultMessage();
+		if (defaultMessage != null) {
+			return defaultMessage;
+		}
+
+		String code = !ObjectUtils.isEmpty(codes) ? codes[codes.length - 1] : "";
+		throw new NoSuchMessageException(code, Objects.requireNonNullElse(locale, this.defaultLocale));
+	}
+
+	/**
+	 * Resolves the given code for the requested locale and formats it with the given arguments.
+	 *
+	 * <p>Lookup order: the in-memory base (locale fallback delegated to the JDK via
+	 * {@link ResourceBundle}), then the parent message source, if configured.
+	 *
+	 * @param code the message code to resolve
+	 * @param args the arguments to format the message with, or {@code null} for none
+	 * @param locale the locale to resolve for
+	 * @return the resolved message, or {@code null} if the code cannot be resolved
+	 */
+	protected @Nullable String getMessageInternal(@Nullable String code, Object @Nullable [] args,
+		@Nullable Locale locale) {
+		if (code == null) {
+			return null;
+		}
+		if (locale == null) {
+			locale = this.defaultLocale;
+		}
+
+		String value = this.resolveFromBase(code, locale, args);
+
+		if (ObjectUtils.isEmpty(args) || value == null) {
+			return value;
+		}
+
+		return (this.useICU4j ? icu : jdk).format(value, locale, args);
+	}
+
+	/**
+	 * Resolves the code through the JDK-driven bundle (locale fallback applied), then falls back
+	 * to the parent message source, if configured.
+	 */
+	private @Nullable String resolveFromBase(String code, Locale locale, Object @Nullable [] args) {
+		if (locale.getLanguage().isEmpty() || code.isEmpty()) {
+			return null;
+		}
+
+		String value = this.resolveFromBundle(code, locale);
+		if (value != null) {
+			return value;
+		}
+
+		if (this.parentMessageSource != null) {
+			return this.parentMessageSource.getMessage(code, args, null, locale);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Stores a translation under its code.
+	 */
+	private void put(Locale locale, String code, String value) {
+		if (locale.getLanguage().isEmpty()) {
+			return;
+		}
+
+		ConcurrentMap<String, String> bucket = this.transUnits.computeIfAbsent(
+			locale, l -> new ConcurrentHashMap<>()
+		);
+
+		bucket.putIfAbsent(code, value);
+	}
+
+	/**
+	 * Resolves the code against the in-memory base using the JDK locale fallback.
+	 */
+	private @Nullable String resolveFromBundle(String code, Locale locale) {
+		ResourceBundle bundle = this.getResourceBundle(locale);
+
+		if (bundle.containsKey(code)) {
+			return bundle.getString(code);
+		}
+		return null;
+	}
+
+	/**
+	 * Returns the bundle for the locale from the per-instance cachedBundles cache, building it
+	 * once on a miss.
+	 */
+	private ResourceBundle getResourceBundle(Locale locale) {
+		ResourceBundle cached = this.bundles.get(locale);
+		if (cached != null) {
+			return cached;
+		}
+
+		ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_BASE_NAME, locale, this.control);
+		this.bundles.put(locale, bundle);
+		return bundle;
+	}
+
+	/**
+	 * A ResourceBundle.Control that serves the in-memory base map instead of .properties/.class
+	 * files, delegating the locale fallback to the JDK. The default candidate-locale chain is kept
+	 * (region → language → root); root is mapped to the configured default locale, so the chain
+	 * bottoms out there — preserving the builder's configurable defaultLocale fallback. The JDK's
+	 * own bundle cache is disabled (TTL_DONT_CACHE) so instances never collide in the shared,
+	 * class-loader-scoped cache and nothing leaks into it; caching is done per instance in
+	 * cachedBundles. newBundle creates the locale's base bucket eagerly (never returns null) and
+	 * the BaseResourceBundle holds it by live reference, so late-binding entries added later via
+	 * put stay visible to the cached bundle chain.
+	 */
+	private final class BaseControl extends ResourceBundle.Control {
+
+		@Override
+		public List<String> getFormats(String baseName) {
+			return List.of(BUNDLE_FORMAT);
+		}
+
+		@Override
+		public Locale getFallbackLocale(String baseName, Locale locale) {
+			return BaseMessageSourceBuilder.this.defaultLocale;
+		}
+
+		@Override
+		public long getTimeToLive(String baseName, Locale locale) {
+			return TTL_DONT_CACHE;
+		}
+
+		@Override
+		public ResourceBundle newBundle(
+			String baseName,
+			Locale locale,
+			String format,
+			ClassLoader loader,
+			boolean reload
+		) {
+			Locale bucketLocale = locale.equals(Locale.ROOT)
+				? BaseMessageSourceBuilder.this.defaultLocale
+				: locale;
+			ConcurrentMap<String, String> bucket = BaseMessageSourceBuilder.this.transUnits.computeIfAbsent(
+				bucketLocale, l -> new ConcurrentHashMap<>()
+			);
+
+			return new BaseResourceBundle(bucket);
+		}
+	}
+
+	/**
+	 * A ResourceBundle over a single locale's base bucket. handleGetObject returns null on a
+	 * miss (rather than throwing) so the JDK locale fallback is not short-circuited. The bucket is
+	 * referenced live, so entries added later are picked up.
+	 */
+	private static final class BaseResourceBundle extends ResourceBundle {
+
+		private final Map<String, String> entries;
+
+		BaseResourceBundle(Map<String, String> entries) {
+			this.entries = entries;
+		}
+
+		@Override
+		protected @Nullable Object handleGetObject(String code) {
+			return this.entries.get(code);
+		}
+
+		@Override
+		public Enumeration<String> getKeys() {
+			return Collections.enumeration(this.entries.keySet());
+		}
+	}
+
+	/**
+	 * Fluent builder for {@link BaseMessageSourceBuilder}. Holds the configured sources
+	 * and the default locale until {@link #build()} is called.
+	 */
+	public static final class Builder extends AbstractBaseMessageSourceBuilder<Builder> {
+
+		/** Trans units to aggregate into the base. */
+		private final List<TransUnitInterface> transUnits;
+
+		/**
+		 * Creates a new builder seeded with an initial source.
+		 */
+		private Builder(Locale defaultLocale, List<TransUnitInterface> transUnits) {
+			super(defaultLocale);
+			Assert.notNull(transUnits, "Argument transUnits must not be null");
+
+			this.transUnits = transUnits;
+		}
+
+		/**
+		 * Builds a {@link BaseMessageSourceBuilder} from the configured sources and default
+		 * locale. Trans units are aggregated and the sources are composed
+		 * at this point; subsequent mutations of the builder have no effect on the
+		 * returned instance.
+		 *
+		 * @return a new {@link BaseMessageSourceBuilder} instance
+		 */
+		public BaseMessageSourceBuilder build() {
+			return new BaseMessageSourceBuilder(
+				this.getDefaultLocale(),
+				this.transUnits,
+				this.isICU4jEnabled(),
+				this.getParentMessageSource()
+			);
+		}
+	}
+}
