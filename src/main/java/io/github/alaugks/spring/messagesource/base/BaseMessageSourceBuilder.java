@@ -58,7 +58,7 @@ public class BaseMessageSourceBuilder implements MessageSource {
 	 * A {@link MessageFormatter} implementation that uses the ICU4J library for message formatting.
 	 * This formatter supports both positional and named argument formatting.
 	 */
-	private final MessageFormatter icu = (value, locale, args) -> {
+	private final MessageFormatter icu4jMessageFormat = (value, locale, args) -> {
 		com.ibm.icu.text.MessageFormat messageFormat = new com.ibm.icu.text.MessageFormat(value, locale);
 
 		if (args.length == 1 && args[0] instanceof java.util.Map<?, ?> map) {
@@ -73,7 +73,7 @@ public class BaseMessageSourceBuilder implements MessageSource {
 	/**
 	 * Message formatter implementation that uses the JDK's {@link java.text.MessageFormat}.
 	 */
-	private final MessageFormatter jdk = (value, locale, args) ->
+	private final MessageFormatter jdkMessageFormat = (value, locale, args) ->
 		new java.text.MessageFormat(value, locale).format(args);
 
 	/**
@@ -176,7 +176,7 @@ public class BaseMessageSourceBuilder implements MessageSource {
 			return value;
 		}
 
-		return (this.useICU4j ? icu : jdk).format(value, locale, args);
+		return (this.useICU4j ? this.icu4jMessageFormat : this.jdkMessageFormat).format(value, locale, args);
 	}
 
 	/**
