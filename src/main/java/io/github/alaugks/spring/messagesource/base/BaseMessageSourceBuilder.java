@@ -161,7 +161,8 @@ public final class BaseMessageSourceBuilder implements MessageSource {
 	 * @param locale the locale to resolve for
 	 * @return the resolved message, or {@code null} if the code cannot be resolved
 	 */
-	protected @Nullable String getMessageInternal(@Nullable String code, Object @Nullable [] args,
+	@Nullable
+	private String getMessageInternal(@Nullable String code, Object @Nullable [] args,
 		@Nullable Locale locale) {
 		if (code == null) {
 			return null;
