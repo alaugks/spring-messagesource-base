@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
+import org.springframework.core.io.Resource;
 
 /**
  * Raw, loaded translation resource: locale and file bytes.
@@ -15,9 +16,13 @@ import org.jspecify.annotations.Nullable;
  * content is compared by value rather than by identity.
  *
  * @param locale  the locale parsed from the file name, or the default locale when none was given
- * @param content the raw file bytes
+ * @param content the raw file bytes, or null if no content is associated
  */
-public record TransFile(Locale locale, byte[] content) implements TransFileInterface {
+public record TransFile(Locale locale, byte @Nullable [] content, @Nullable Resource resource) implements TransFileInterface {
+
+	public TransFile(Locale locale, byte @Nullable [] content) {
+		this(locale, content, null);
+	}
 
 	@Override
 	public boolean equals(@Nullable Object o) {

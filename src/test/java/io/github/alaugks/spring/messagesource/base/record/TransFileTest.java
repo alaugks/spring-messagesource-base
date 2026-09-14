@@ -8,7 +8,13 @@ import io.github.alaugks.spring.messagesource.base.records.TransFileInterface;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -16,33 +22,47 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class TransFileTest {
 
-	@Test
-	void test_record() throws IOException {
+	@ParameterizedTest()
+	@MethodSource("provider_transunits")
+	void test_record(Locale locale, byte[] content, Resource resource) {
+
+		TransFileInterface translationFile = new TransFile(
+			locale,
+				content,
+				resource
+		);
+
+		assertEquals(locale, translationFile.locale());
+		assertEquals(content, translationFile.content());
+		assertEquals(resource, translationFile.resource());
+	}
+
+	private static Stream<Arguments> provider_transunits() throws IOException {
 		byte[] content;
-		try (InputStream inputStream = this.getClass().getClassLoader()
-				.getResourceAsStream("translations_en_US/messages_en_US.txt")) {
+		try (InputStream inputStream = TransFileTest.class.getClassLoader()
+			.getResourceAsStream("translations_en_US/messages_en_US.txt")) {
 			assertNotNull(inputStream);
 			content = inputStream.readAllBytes();
 		}
+		Resource resource = new ClassPathResource("translations_en_US/messages_en_US.txt");
 
-		TransFileInterface translationFile = new TransFile(
-			Locale.forLanguageTag("en-US"),
-				content
+		return Stream.of(
+			Arguments.of(Locale.forLanguageTag("en-US"), content, resource),
+			Arguments.of(Locale.forLanguageTag("en-US"), content, null),
+			Arguments.of(Locale.forLanguageTag("en-US"), null, null)
 		);
-
-		assertEquals(Locale.forLanguageTag("en-US"), translationFile.locale());
-		assertEquals(content, translationFile.content());
 	}
+
 
 	@Test
 	void test_equals() {
 		TransFileInterface a = new TransFile(
 			Locale.forLanguageTag("en-US"),
-				new byte[] {1, 2, 3}
+			new byte[] {1, 2, 3}
 		);
 		TransFile b = new TransFile(
 			Locale.forLanguageTag("en-US"),
-				new byte[] {1, 2, 3}
+			new byte[] {1, 2, 3}
 		);
 
 		assertEquals(a, b);
@@ -71,11 +91,11 @@ class TransFileTest {
 	void test_hash_code() {
 		TransFileInterface a = new TransFile(
 			Locale.forLanguageTag("en-US"),
-				new byte[] {1, 2, 3}
+			new byte[] {1, 2, 3}
 		);
 		TransFile b = new TransFile(
-			Locale.forLanguageTag("en-US"),
-				new byte[] {1, 2, 3}
+		Locale.forLanguageTag("en-US"),
+		new byte[] {1, 2, 3}
 		);
 
 		assertEquals(a.hashCode(), b.hashCode());
@@ -85,7 +105,7 @@ class TransFileTest {
 	void test_to_string() {
 		TransFileInterface translationFile = new TransFile(
 			Locale.forLanguageTag("en-US"),
-				new byte[] {1, 2, 3}
+			new byte[] {1, 2, 3}
 		);
 
         assertEquals("TranslationFile[locale=en_US, content=3 bytes]", translationFile.toString());
@@ -95,7 +115,7 @@ class TransFileTest {
 	void test_to_string_null_content() {
 		TransFileInterface translationFile = new TransFile(
 			Locale.forLanguageTag("en-US"),
-				null
+			null
 		);
 
 		assertEquals("TranslationFile[locale=en_US, content=null]", translationFile.toString());

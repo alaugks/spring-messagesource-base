@@ -142,7 +142,8 @@ public class ResourceLoaderBuilder {
 				Locale locale = targetLocale.locale();
 				return new TransFile(
 					locale != null ? locale : this.defaultLocale,
-						inputStream.readAllBytes()
+					inputStream.readAllBytes(),
+					resource
 				);
 			}
 		}
