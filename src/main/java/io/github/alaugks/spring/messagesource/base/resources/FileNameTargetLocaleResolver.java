@@ -33,7 +33,7 @@ import org.springframework.util.Assert;
  *   <li>{@code messages.en-US.ext} &rarr; language={@code en}, region={@code US}</li>
  * </ul>
  */
-public class FileNameTargetLocaleResolver implements TargetLocaleResolverInterface {
+public final class FileNameTargetLocaleResolver implements TargetLocaleResolverInterface {
 
 	/** Matches the optional language/region suffix and the mandatory extension at the end of a resource file name. */
 	private static final Pattern PATTERN = Pattern.compile(
