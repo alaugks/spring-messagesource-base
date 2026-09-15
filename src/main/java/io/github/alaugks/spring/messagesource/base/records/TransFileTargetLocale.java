@@ -19,11 +19,24 @@ public record TransFileTargetLocale(@Nullable String language, @Nullable String 
 	TransFileTargetLocaleInterface {
 
 	/**
+	 * Constructs an instance of {@code TransFileTargetLocale} using the given {@link Locale}.
+	 *
+	 * This constructor extracts the language and region components from the provided locale
+	 * and uses them to initialize the corresponding fields of the record.
+	 *
+	 * @param locale the {@link Locale} object from which the language and region components
+	 *               are derived; must not be {@code null}.
+	 */
+	public TransFileTargetLocale(Locale locale) {
+		this(locale.getLanguage(), locale.getCountry());
+	}
+
+	/**
 	 * {@return {@code true} when the file name contains a language part}
 	 */
 	@Override
 	public boolean hasLocale() {
-		return this.language != null;
+		return this.locale() != null;
 	}
 
 	/**

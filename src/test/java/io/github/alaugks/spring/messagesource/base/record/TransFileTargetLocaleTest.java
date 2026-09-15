@@ -6,8 +6,10 @@ package io.github.alaugks.spring.messagesource.base.record;
 import io.github.alaugks.spring.messagesource.base.exception.BaseMessageSourceRuntimeException;
 import io.github.alaugks.spring.messagesource.base.records.TransFileTargetLocale;
 import io.github.alaugks.spring.messagesource.base.records.TransFileTargetLocaleInterface;
+import java.util.Locale;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -26,6 +28,16 @@ class TransFileTargetLocaleTest {
 		TransFileTargetLocaleInterface filename = new TransFileTargetLocale("en", null);
 
 		assertTrue(filename.hasLocale());
+	}
+
+	@Test
+	void test_local_constructor() {
+		TransFileTargetLocaleInterface filename = new TransFileTargetLocale(Locale.forLanguageTag("en-US"));
+
+		assertTrue(filename.hasLocale());
+		assertEquals(Locale.forLanguageTag("en-US"), filename.locale());
+		assertEquals("en", filename.language());
+		assertEquals("US", filename.region());
 	}
 
 	@Test
