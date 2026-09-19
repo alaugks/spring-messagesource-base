@@ -39,7 +39,7 @@ import org.springframework.util.Assert;
  * <p>Used by sibling parser packages (XLIFF, JSON) as the file-loading stage that precedes
  * format-specific parsing.
  */
-public class ResourceLoaderBuilder {
+public final class ResourceLoaderBuilder {
 
 	/** Locale used when a file name carries no locale part. */
 	private final Locale defaultLocale;

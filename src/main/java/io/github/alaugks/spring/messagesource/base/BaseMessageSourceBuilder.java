@@ -28,7 +28,7 @@ import org.springframework.util.ObjectUtils;
  * <p>Use {@link #builder(Locale, List)} to obtain a {@link Builder} and configure ICU4J
  * formatting or a parent message source before calling {@link Builder#build()}.
  */
-public class BaseMessageSourceBuilder implements MessageSource {
+public final class BaseMessageSourceBuilder implements MessageSource {
 
 	/** Internal base name for the ResourceBundle that serves the base. */
 	private static final String BUNDLE_BASE_NAME = BaseMessageSourceBuilder.class.getPackageName();
@@ -161,7 +161,8 @@ public class BaseMessageSourceBuilder implements MessageSource {
 	 * @param locale the locale to resolve for
 	 * @return the resolved message, or {@code null} if the code cannot be resolved
 	 */
-	protected @Nullable String getMessageInternal(@Nullable String code, Object @Nullable [] args,
+	@Nullable
+	private String getMessageInternal(@Nullable String code, Object @Nullable [] args,
 		@Nullable Locale locale) {
 		if (code == null) {
 			return null;

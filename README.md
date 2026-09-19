@@ -3,7 +3,7 @@
 This package provides the [MessageSource interface](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/MessageSource.html). Internally, it builds a [`ResourceBundle`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ResourceBundle.html) and delegates locale fallback handling to it — the same mechanism Spring's own [ResourceBundleMessageSource](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/support/ResourceBundleMessageSource.html) relies on.
 
 [![Quality gate status](https://sonarcloud.io/api/project_badges/measure?project=alaugks_spring-messagesource-base&metric=alert_status&token=3f69e5749285dea5ae7ba2f6696d1fb976e7f51d)](https://sonarcloud.io/summary/new_code?id=alaugks_spring-messagesource-base)
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.alaugks/spring-messagesource-base.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.alaugks/spring-messagesource-base/0.1.0)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.alaugks/spring-messagesource-base.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.alaugks/spring-messagesource-base/0.2.0)
 
 ## Table of Contents
 
@@ -31,14 +31,14 @@ This package provides the [MessageSource interface](https://docs.spring.io/sprin
 <dependency>
     <groupId>io.github.alaugks</groupId>
     <artifactId>spring-messagesource-base</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```
-implementation group: 'io.github.alaugks', name: 'spring-messagesource-base', version: '0.1.0'
+implementation group: 'io.github.alaugks', name: 'spring-messagesource-base', version: '0.2.0'
 ```
 
 ## Packages that use this package as a base package
