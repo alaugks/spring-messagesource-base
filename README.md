@@ -43,6 +43,8 @@ implementation group: 'io.github.alaugks', name: 'spring-messagesource-base', ve
 
 ## Packages that use this package as a base package
 
+
+
 * [spring-messagesource-xliff](https://github.com/alaugks/spring-messagesource-xliff): Xliff MessageSource for Spring
 * [spring-messagesource-json](https://github.com/alaugks/spring-messagesource-json): JSON MessageSource for Spring
 * [spring-messagesource-db-example](https://github.com/alaugks/spring-messagesource-db-example): Example custom Spring MessageSource from database
@@ -56,6 +58,8 @@ implementation group: 'io.github.alaugks', name: 'spring-messagesource-base', ve
 | `builder(Locale defaultLocale, List<TransUnitInterface> transUnits)` | —          | Entry point.<br><br>`defaultLocale` is the locale to fall back to when a code cannot be resolved for the requested locale.<br><br>`transUnits` are aggregated into the in-memory base.                                                                       |
 | `enableICU4j()`                                                      | disabled   | Format messages with ICU4J's `com.ibm.icu.text.MessageFormat` instead of the default `java.text.MessageFormat`. Adds named arguments and ICU `plural`/`select` patterns. See [Message formatting](#message-formatting) for details and examples.             |
 | `parentMessageSource(MessageSource parentMessageSource)`             | —          | Sets a parent [`MessageSource`](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/MessageSource.html) to delegate to. When a code cannot be resolved in the base, the lookup falls back to the parent source.     |
+| `duplicateKeyStrategy(DuplicateKeyStrategy strategy)`                | `KEEP_FIRST` | How a duplicate translation (same locale and code) is handled: `FAIL` throws a `BaseMessageSourceRuntimeException` naming code, locale and both values; `KEEP_FIRST` keeps the first value, `KEEP_LAST` the last one (both log a warning). |
+| `disableDuplicateKeyStrategyLogging()`                               | enabled    | Disables the warning logged when a duplicate is resolved by `KEEP_FIRST` or `KEEP_LAST`. Has no effect for `FAIL`. |
 | `build()`                                                            | —          | Builds the `BaseMessageSourceBuilder` from the configured trans units and default locale. Trans units are aggregated at this point; subsequent mutations of the builder have no effect on the returned instance.                                          |
 
 ### TransUnit Record

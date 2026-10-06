@@ -30,6 +30,12 @@ public abstract class AbstractBaseMessageSourceBuilder<B extends AbstractBaseMes
     /** Optional parent consulted when a code cannot be resolved locally. */
     private @Nullable MessageSource parentMessageSource = null;
 
+    /** How duplicate translations (same locale and code) are handled. */
+    private DuplicateKeyStrategy duplicateKeyStrategy = DuplicateKeyStrategy.KEEP_FIRST;
+
+    /** Whether a warning is logged when a duplicate is resolved by KEEP_FIRST or KEEP_LAST. */
+    private boolean duplicateKeyStrategyLogging = true;
+
     protected AbstractBaseMessageSourceBuilder(Locale defaultLocale) {
         Assert.notNull(defaultLocale, "Argument defaultLocale must not be null");
 
@@ -97,5 +103,48 @@ public abstract class AbstractBaseMessageSourceBuilder<B extends AbstractBaseMes
      */
     protected @Nullable MessageSource getParentMessageSource() {
         return this.parentMessageSource;
+    }
+
+    /**
+     * Sets how duplicate translations (same locale and code) are handled.
+     * Defaults to {@link DuplicateKeyStrategy#KEEP_FIRST}.
+     *
+     * @param duplicateKeyStrategy the strategy; must not be {@code null}
+     * @return this builder
+     */
+    public B duplicateKeyStrategy(DuplicateKeyStrategy duplicateKeyStrategy) {
+        Assert.notNull(duplicateKeyStrategy, "Argument duplicateKeyStrategy must not be null");
+        this.duplicateKeyStrategy = duplicateKeyStrategy;
+
+        return (B) this;
+    }
+
+    /**
+     * {@return the strategy used to handle duplicate translations}
+     * @see #duplicateKeyStrategy(DuplicateKeyStrategy)
+     */
+    protected DuplicateKeyStrategy getDuplicateKeyStrategy() {
+        return this.duplicateKeyStrategy;
+    }
+
+    /**
+     * Disables the warning that is logged when a duplicate translation is resolved by
+     * {@link DuplicateKeyStrategy#KEEP_FIRST} or {@link DuplicateKeyStrategy#KEEP_LAST}.
+     * Has no effect for {@link DuplicateKeyStrategy#FAIL}, which never logs.
+     *
+     * @return this builder
+     */
+    public B disableDuplicateKeyStrategyLogging() {
+        this.duplicateKeyStrategyLogging = false;
+
+        return (B) this;
+    }
+
+    /**
+     * {@return {@code true} if duplicates resolved by KEEP_FIRST or KEEP_LAST are logged}
+     * @see #disableDuplicateKeyStrategyLogging()
+     */
+    protected boolean isDuplicateKeyStrategyLoggingEnabled() {
+        return this.duplicateKeyStrategyLogging;
     }
 }

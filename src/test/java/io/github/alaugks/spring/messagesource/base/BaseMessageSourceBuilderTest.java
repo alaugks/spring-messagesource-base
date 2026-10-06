@@ -3,6 +3,8 @@
 
 package io.github.alaugks.spring.messagesource.base;
 
+import io.github.alaugks.spring.messagesource.base.BaseMessageSourceBuilder.Builder;
+import io.github.alaugks.spring.messagesource.base.exception.BaseMessageSourceRuntimeException;
 import io.github.alaugks.spring.messagesource.base.fxitures.ParentMessageSource;
 import io.github.alaugks.spring.messagesource.base.records.TransUnit;
 import io.github.alaugks.spring.messagesource.base.records.TransUnitInterface;
@@ -10,15 +12,23 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SuppressWarnings({"java:S4144"})
+@ExtendWith(OutputCaptureExtension.class)
 class BaseMessageSourceBuilderTest {
 
 	static final Locale LOCALE_EN = Locale.forLanguageTag("en");
@@ -434,5 +444,89 @@ class BaseMessageSourceBuilderTest {
 		assertEquals("value_en_a", ms.getMessage("code_a", null, LOCALE_EN));
 		assertEquals("ParentMessageSource with args: 1,234", ms.getMessage("parent-messagesource-code", new Object[]{1234}, LOCALE_EN));
 		assertThrows(NoSuchMessageException.class, () -> ms.getMessage("not_exists", null, LOCALE_EN));
+	}
+
+	@Test
+	void test_duplicate_key_default_is_keep_first(CapturedOutput output) {
+		BaseMessageSourceBuilder messageSource = BaseMessageSourceBuilder
+			.builder(LOCALE_EN, duplicateTransUnits())
+			.build();
+
+		assertEquals("Kasse", messageSource.getMessage("checkout.title", null, LOCALE_DE));
+		assertTrue(output.getOut().contains("Duplicate translation"));
+	}
+
+	@Test
+	void test_duplicate_key_fail() {
+		Builder builder = BaseMessageSourceBuilder
+			.builder(LOCALE_EN, duplicateTransUnits())
+			.duplicateKeyStrategy(DuplicateKeyStrategy.FAIL);
+
+		BaseMessageSourceRuntimeException e = assertThrows(
+			BaseMessageSourceRuntimeException.class,
+			builder::build
+		);
+
+		assertTrue(e.getMessage().contains("checkout.title"));
+		assertTrue(e.getMessage().contains("de"));
+		assertTrue(e.getMessage().contains("Kasse"));
+		assertTrue(e.getMessage().contains("Bestellung"));
+	}
+
+	@Test
+	void test_duplicate_key_keep_first() {
+		BaseMessageSourceBuilder messageSource = BaseMessageSourceBuilder
+			.builder(LOCALE_EN, duplicateTransUnits())
+			.duplicateKeyStrategy(DuplicateKeyStrategy.KEEP_FIRST)
+			.build();
+
+		assertEquals("Kasse", messageSource.getMessage("checkout.title", null, LOCALE_DE));
+	}
+
+	@Test
+	void test_duplicate_key_keep_last() {
+		BaseMessageSourceBuilder messageSource = BaseMessageSourceBuilder
+			.builder(LOCALE_EN, duplicateTransUnits())
+			.duplicateKeyStrategy(DuplicateKeyStrategy.KEEP_LAST)
+			.build();
+
+		assertEquals("Bestellung", messageSource.getMessage("checkout.title", null, LOCALE_DE));
+	}
+
+	@ParameterizedTest
+	@EnumSource(value = DuplicateKeyStrategy.class, names = {"KEEP_FIRST", "KEEP_LAST"})
+	void test_duplicate_key_is_logged(DuplicateKeyStrategy strategy, CapturedOutput output) {
+		BaseMessageSourceBuilder.builder(LOCALE_EN, duplicateTransUnits())
+			.duplicateKeyStrategy(strategy)
+			.build();
+
+		assertTrue(output.getOut().contains("Duplicate translation"));
+	}
+
+	@ParameterizedTest
+	@EnumSource(value = DuplicateKeyStrategy.class, names = {"KEEP_FIRST", "KEEP_LAST"})
+	void test_duplicate_key_logging_can_be_disabled(DuplicateKeyStrategy strategy, CapturedOutput output) {
+		BaseMessageSourceBuilder.builder(LOCALE_EN, duplicateTransUnits())
+			.duplicateKeyStrategy(strategy)
+			.disableDuplicateKeyStrategyLogging()
+			.build();
+
+		assertFalse(output.getOut().contains("Duplicate translation"));
+		assertFalse(output.getErr().contains("Duplicate translation"));
+	}
+
+	@Test
+	void test_duplicate_key_strategy_must_not_be_null() {
+		Builder builder = BaseMessageSourceBuilder
+			.builder(LOCALE_EN, List.of());
+
+		assertThrows(IllegalArgumentException.class, () -> builder.duplicateKeyStrategy(null));
+	}
+
+	private static List<TransUnitInterface> duplicateTransUnits() {
+		return List.of(
+			new TransUnit(LOCALE_DE, "checkout.title", "Kasse"),
+			new TransUnit(LOCALE_DE, "checkout.title", "Bestellung")
+		);
 	}
 }

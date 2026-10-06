@@ -3,6 +3,7 @@
 
 package io.github.alaugks.spring.messagesource.base;
 
+import io.github.alaugks.spring.messagesource.base.exception.BaseMessageSourceRuntimeException;
 import io.github.alaugks.spring.messagesource.base.records.TransUnitInterface;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -13,6 +14,8 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.Nullable;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceResolvable;
@@ -29,6 +32,8 @@ import org.springframework.util.ObjectUtils;
  * formatting or a parent message source before calling {@link Builder#build()}.
  */
 public final class BaseMessageSourceBuilder implements MessageSource {
+
+	private static final Log LOG = LogFactory.getLog(BaseMessageSourceBuilder.class);
 
 	/** Internal base name for the ResourceBundle that serves the base. */
 	private static final String BUNDLE_BASE_NAME = BaseMessageSourceBuilder.class.getPackageName();
@@ -50,6 +55,12 @@ public final class BaseMessageSourceBuilder implements MessageSource {
 
 	/** Whether messages are formatted with ICU4J. */
 	private final boolean useICU4j;
+
+	/** How duplicate translations are handled while aggregating. */
+	private final DuplicateKeyStrategy duplicateKeyStrategy;
+
+	/** Whether duplicates resolved by KEEP_FIRST or KEEP_LAST are logged. */
+	private final boolean duplicateKeyStrategyLogging;
 
 	/** Optional parent consulted when a code cannot be resolved locally. */
 	private final @Nullable MessageSource parentMessageSource;
@@ -84,8 +95,12 @@ public final class BaseMessageSourceBuilder implements MessageSource {
 		Locale defaultLocale,
 		List<TransUnitInterface> transUnits,
 		boolean useICU4j,
-		@Nullable MessageSource parentMessageSource
+		@Nullable MessageSource parentMessageSource,
+		DuplicateKeyStrategy duplicateKeyStrategy,
+		boolean duplicateKeyStrategyLogging
 	) {
+		this.duplicateKeyStrategy = duplicateKeyStrategy;
+		this.duplicateKeyStrategyLogging = duplicateKeyStrategyLogging;
 		this.defaultLocale = defaultLocale;
 		this.useICU4j = useICU4j;
 		this.parentMessageSource = parentMessageSource;
@@ -202,7 +217,7 @@ public final class BaseMessageSourceBuilder implements MessageSource {
 	}
 
 	/**
-	 * Stores a translation under its code.
+	 * Stores a translation under its code. A duplicate (already present locale and code) is handled according to the {@link DuplicateKeyStrategy}.
 	 */
 	private void put(Locale locale, String code, String value) {
 		if (locale.getLanguage().isEmpty()) {
@@ -213,7 +228,31 @@ public final class BaseMessageSourceBuilder implements MessageSource {
 			locale, l -> new ConcurrentHashMap<>()
 		);
 
-		bucket.putIfAbsent(code, value);
+
+		String existing = bucket.putIfAbsent(code, value);
+		if (existing == null) {
+			return;
+		}
+
+		String detail = String.format(
+			"Duplicate translation: code: '%s', locale: %s, first value: %s, second value: %s.",
+			code, locale, existing, value
+		);
+
+		switch (this.duplicateKeyStrategy) {
+			case FAIL -> throw new BaseMessageSourceRuntimeException(detail);
+			case KEEP_FIRST -> this.log(detail + " Keeping the first value.");
+			case KEEP_LAST -> {
+				this.log(detail + " Using the last value.");
+				bucket.put(code, value);
+			}
+		}
+	}
+
+	private void log(String message) {
+		if (this.duplicateKeyStrategyLogging) {
+			LOG.warn(message);
+		}
 	}
 
 	/**
@@ -346,7 +385,9 @@ public final class BaseMessageSourceBuilder implements MessageSource {
 				this.getDefaultLocale(),
 				this.transUnits,
 				this.isICU4jEnabled(),
-				this.getParentMessageSource()
+				this.getParentMessageSource(),
+				this.getDuplicateKeyStrategy(),
+				this.isDuplicateKeyStrategyLoggingEnabled()
 			);
 		}
 	}

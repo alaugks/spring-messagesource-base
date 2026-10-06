@@ -18,4 +18,13 @@ public class BaseMessageSourceRuntimeException extends RuntimeException {
 	public BaseMessageSourceRuntimeException(Throwable cause) {
 		super(cause);
 	}
+
+	/**
+	 * Creates an unchecked base exception with the given message.
+	 *
+	 * @param message the detail message
+	 */
+	public BaseMessageSourceRuntimeException(String message) {
+		super(message);
+	}
 }
