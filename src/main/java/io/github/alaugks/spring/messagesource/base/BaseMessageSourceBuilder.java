@@ -80,18 +80,15 @@ public final class BaseMessageSourceBuilder implements MessageSource {
 	 * Aggregates trans units into the base map and composes the sources for
 	 * late-binding fallback.
 	 */
-	private BaseMessageSourceBuilder(
-		Locale defaultLocale,
-		List<TransUnitInterface> transUnits,
-		boolean useICU4j,
-		@Nullable MessageSource parentMessageSource
-	) {
-		this.defaultLocale = defaultLocale;
-		this.useICU4j = useICU4j;
-		this.parentMessageSource = parentMessageSource;
+	private BaseMessageSourceBuilder(Builder builder) {
+
+
+		this.defaultLocale = builder.getDefaultLocale();
+		this.useICU4j = builder.isICU4jEnabled();
+		this.parentMessageSource = builder.getParentMessageSource();
 		this.transUnits = new ConcurrentHashMap<>();
 
-		transUnits.forEach(t -> this.put(t.locale(), t.code(), t.value()));
+		builder.transUnits.forEach(t -> this.put(t.locale(), t.code(), t.value()));
 	}
 
 	/**
@@ -342,12 +339,7 @@ public final class BaseMessageSourceBuilder implements MessageSource {
 		 * @return a new {@link BaseMessageSourceBuilder} instance
 		 */
 		public BaseMessageSourceBuilder build() {
-			return new BaseMessageSourceBuilder(
-				this.getDefaultLocale(),
-				this.transUnits,
-				this.isICU4jEnabled(),
-				this.getParentMessageSource()
-			);
+			return new BaseMessageSourceBuilder(this);
 		}
 	}
 }
