@@ -80,18 +80,13 @@ public final class BaseMessageSourceBuilder implements MessageSource {
 	 * Aggregates trans units into the base map and composes the sources for
 	 * late-binding fallback.
 	 */
-	private BaseMessageSourceBuilder(
-		Locale defaultLocale,
-		List<TransUnitInterface> transUnits,
-		boolean useICU4j,
-		@Nullable MessageSource parentMessageSource
-	) {
-		this.defaultLocale = defaultLocale;
-		this.useICU4j = useICU4j;
-		this.parentMessageSource = parentMessageSource;
+	private BaseMessageSourceBuilder(Builder builder) {
+		this.defaultLocale = builder.getDefaultLocale();
+		this.useICU4j = builder.isICU4jEnabled();
+		this.parentMessageSource = builder.getParentMessageSource();
 		this.transUnits = new ConcurrentHashMap<>();
 
-		transUnits.forEach(t -> this.put(t.locale(), t.code(), t.value()));
+		builder.transUnits.forEach(t -> this.put(t.locale(), t.code(), t.value()));
 	}
 
 	/**
@@ -107,7 +102,7 @@ public final class BaseMessageSourceBuilder implements MessageSource {
 	}
 
 	@Override
-	public final @Nullable String getMessage(String code, Object @Nullable [] args, @Nullable String defaultMessage,
+	public @Nullable String getMessage(String code, Object @Nullable [] args, @Nullable String defaultMessage,
 		@Nullable Locale locale) {
 		String msg = this.getMessageInternal(code, args, locale);
 		if (msg != null) {
@@ -118,7 +113,7 @@ public final class BaseMessageSourceBuilder implements MessageSource {
 	}
 
 	@Override
-	public final String getMessage(String code, Object @Nullable [] args, @Nullable Locale locale)
+	public String getMessage(String code, Object @Nullable [] args, @Nullable Locale locale)
 		throws NoSuchMessageException {
 		String msg = this.getMessageInternal(code, args, locale);
 		if (msg != null) {
@@ -129,7 +124,7 @@ public final class BaseMessageSourceBuilder implements MessageSource {
 	}
 
 	@Override
-	public final String getMessage(MessageSourceResolvable resolvable, @Nullable Locale locale)
+	public String getMessage(MessageSourceResolvable resolvable, @Nullable Locale locale)
 		throws NoSuchMessageException {
 		String[] codes = resolvable.getCodes();
 		if (codes != null) {
@@ -342,12 +337,7 @@ public final class BaseMessageSourceBuilder implements MessageSource {
 		 * @return a new {@link BaseMessageSourceBuilder} instance
 		 */
 		public BaseMessageSourceBuilder build() {
-			return new BaseMessageSourceBuilder(
-				this.getDefaultLocale(),
-				this.transUnits,
-				this.isICU4jEnabled(),
-				this.getParentMessageSource()
-			);
+			return new BaseMessageSourceBuilder(this);
 		}
 	}
 }

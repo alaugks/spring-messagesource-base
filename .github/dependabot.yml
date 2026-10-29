@@ -3,8 +3,20 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
+    open-pull-requests-limit: 0
     groups:
       actions:
         patterns:
           - "*"
+
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: "org.springframework*:*"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
