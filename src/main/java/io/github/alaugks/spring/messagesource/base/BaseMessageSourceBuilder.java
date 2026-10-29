@@ -81,8 +81,6 @@ public final class BaseMessageSourceBuilder implements MessageSource {
 	 * late-binding fallback.
 	 */
 	private BaseMessageSourceBuilder(Builder builder) {
-
-
 		this.defaultLocale = builder.getDefaultLocale();
 		this.useICU4j = builder.isICU4jEnabled();
 		this.parentMessageSource = builder.getParentMessageSource();
@@ -104,7 +102,7 @@ public final class BaseMessageSourceBuilder implements MessageSource {
 	}
 
 	@Override
-	public final @Nullable String getMessage(String code, Object @Nullable [] args, @Nullable String defaultMessage,
+	public @Nullable String getMessage(String code, Object @Nullable [] args, @Nullable String defaultMessage,
 		@Nullable Locale locale) {
 		String msg = this.getMessageInternal(code, args, locale);
 		if (msg != null) {
@@ -115,7 +113,7 @@ public final class BaseMessageSourceBuilder implements MessageSource {
 	}
 
 	@Override
-	public final String getMessage(String code, Object @Nullable [] args, @Nullable Locale locale)
+	public String getMessage(String code, Object @Nullable [] args, @Nullable Locale locale)
 		throws NoSuchMessageException {
 		String msg = this.getMessageInternal(code, args, locale);
 		if (msg != null) {
@@ -126,7 +124,7 @@ public final class BaseMessageSourceBuilder implements MessageSource {
 	}
 
 	@Override
-	public final String getMessage(MessageSourceResolvable resolvable, @Nullable Locale locale)
+	public String getMessage(MessageSourceResolvable resolvable, @Nullable Locale locale)
 		throws NoSuchMessageException {
 		String[] codes = resolvable.getCodes();
 		if (codes != null) {
